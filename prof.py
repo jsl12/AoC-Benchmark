@@ -1,9 +1,13 @@
+from pathlib import Path
+import pandas as pd
+import re
 from memory_profiler import memory_usage
 import cProfile
 import pstats
+
 from io import StringIO
 from contextlib import redirect_stdout
-from pathlib import Path
+
 from register import REGISTRATION
 
 def profile_repo(repo_path):
@@ -21,12 +25,8 @@ def profile_repo(repo_path):
 
         cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
         stats = pstats.Stats('cstats')
-
-        f = StringIO()
-        with redirect_stdout(f):
-            stats.print_stats()
-        cstats = f.getvalue()
-        print(cstats)
+        stats.print_stats()
+        parse_pstats(stats)
 
     return res
 
@@ -35,6 +35,22 @@ def get_input(day):
     file = [f for f in Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017').glob(glob)][0]
     with open(file, 'r') as f:
         return f.read()
+
+def parse_pstats(stats_obj):
+    df = pd.DataFrame({
+        'paths': [Path(func[0]) for func in stats_obj.stats],
+        'lines': [func[1] for func in stats_obj.stats],
+        'func names': [func[2] for func in stats_obj.stats],
+        # 'func names': [pstats.func_std_string(func) for func in stats_obj.stats],
+        'primitive calls': [stats_obj.stats[func][0] for func in stats_obj.stats],
+        'total calls': [stats_obj.stats[func][1] for func in stats_obj.stats],
+        'total time': [stats_obj.stats[func][2] * 1000 for func in stats_obj.stats],
+        'cumulative time': [stats_obj.stats[func][3] * 1000 for func in stats_obj.stats]
+    })
+
+    df['percall total'] = df['total time'] / df['total calls']
+    df['percall cumulative'] = df['cumulative time'] / df['primitive calls']
+    return df
 
 if __name__ == '__main__':
     prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
