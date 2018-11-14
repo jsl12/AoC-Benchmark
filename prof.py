@@ -1,5 +1,8 @@
 from memory_profiler import memory_usage
 import cProfile
+import pstats
+from io import StringIO
+from contextlib import redirect_stdout
 from pathlib import Path
 from register import REGISTRATION
 
@@ -16,7 +19,14 @@ def profile_repo(repo_path):
         res[day]['Memory'] = memory_usage((DUT,(),{'input': input}), max_usage=True)[0]
         print('Memory used: {}'.format(res[day]['Memory']))
 
-        # cProfile.run('DUT(input)', 'cstats')
+        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
+        stats = pstats.Stats('cstats')
+
+        f = StringIO()
+        with redirect_stdout(f):
+            stats.print_stats()
+        cstats = f.getvalue()
+        print(cstats)
 
     return res
 
