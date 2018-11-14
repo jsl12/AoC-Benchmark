@@ -1,26 +1,28 @@
-from memory_profiler import profile
+from memory_profiler import memory_usage
 from pathlib import Path
-import os
+from register import REGISTRATION
 
-def profile_by_day(day):
-    def aoc_profile(solution_func):
-        def prof(input=None):
-            print('Start profile')
-            print('Day {}'.format(day))
+def profile_repo(repo_path):
+    res = {}
+    for day in REGISTRATION:
+        print('Profiling {}'.format(day))
+        res[day] = {}
 
-            if input is None:
-                with open(Path(os.getcwd()) / 'day{}.txt'.format(day), 'r') as file:
-                    return solution_func(file.read())
-            else:
-                return solution_func(input)
+        DUT = REGISTRATION[day]
 
-            print('End profile')
-        return prof
-    return aoc_profile
+        input = get_input(1)
 
-@profile_by_day(day=2)
-def test_sol(input):
-    print('The start of the puzzle input is:\n{}'.format(input))
+        res[day]['Memory'] = memory_usage((DUT,(),{'input': input}), max_usage=True)[0]
+
+        print('Memory used: {}'.format(res[day]['Memory']))
+    return res
+
+def get_input(day):
+    glob = 'day{}*.txt'.format(day)
+    file = [f for f in Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017').glob(glob)][0]
+    with open(file, 'r') as f:
+        return f.read()
 
 if __name__ == '__main__':
-    test_sol()
+    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
+    print(prof)
