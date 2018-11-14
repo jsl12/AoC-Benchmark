@@ -1,4 +1,5 @@
 from memory_profiler import memory_usage
+import cProfile
 from pathlib import Path
 from register import REGISTRATION
 
@@ -13,8 +14,10 @@ def profile_repo(repo_path):
         input = get_input(1)
 
         res[day]['Memory'] = memory_usage((DUT,(),{'input': input}), max_usage=True)[0]
-
         print('Memory used: {}'.format(res[day]['Memory']))
+
+        # cProfile.run('DUT(input)', 'cstats')
+
     return res
 
 def get_input(day):
