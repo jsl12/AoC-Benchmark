@@ -6,6 +6,8 @@ import sys
 import pandas as pd
 from memory_profiler import memory_usage
 
+INPUT_PATH = Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017')
+
 def profile_repo(repo_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
 
@@ -44,8 +46,8 @@ def profile_repo(repo_path, n=5):
     return res
 
 def get_input(day):
-    glob = 'day{}*.txt'.format(day)
-    file = [f for f in Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017').glob(glob)][0]
+    glob = 'day*{}*.txt'.format(day)
+    file = [f for f in INPUT_PATH.glob(glob)][0]
     with open(file, 'r') as f:
         print('Getting input from {}'.format(file.name))
         return f.read()
