@@ -1,12 +1,8 @@
 from pathlib import Path
 import pandas as pd
-import re
 from memory_profiler import memory_usage
 import cProfile
 import pstats
-
-from io import StringIO
-from contextlib import redirect_stdout
 
 from register import REGISTRATION
 
@@ -35,6 +31,11 @@ def get_input(day):
     file = [f for f in Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017').glob(glob)][0]
     with open(file, 'r') as f:
         return f.read()
+
+def extract_time(pstats, func):
+    for func in pstats.stats:
+        if func.__name__ == func[2]:
+            return pstats.stats[func][3] * 1000
 
 def parse_pstats(stats_obj):
     df = pd.DataFrame({
