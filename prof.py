@@ -1,9 +1,10 @@
 from pathlib import Path
-import pandas as pd
-from memory_profiler import memory_usage
 import cProfile
 import pstats
 import sys
+
+import pandas as pd
+from memory_profiler import memory_usage
 
 def profile_repo(repo_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
