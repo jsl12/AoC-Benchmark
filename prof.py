@@ -5,7 +5,7 @@ import cProfile
 import pstats
 import sys
 
-def profile_repo(repo_path, n=1):
+def profile_repo(repo_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
 
     sys.path.insert(0, str(repo_path))
@@ -14,21 +14,31 @@ def profile_repo(repo_path, n=1):
 
     res = {}
     for day in REGISTRATION:
-        print('Profiling {}...'.format(day))
+        # print('Starting profile of {}'.format(day))
+        print(' {} '.format(day).center(50, '='))
 
         res[day] = {}
 
         DUT = REGISTRATION[day]
+        print('Registered solution function: {}.{}'.format(DUT.__module__, DUT.__name__))
 
         input = get_input(1)
 
-        res[day]['Memory'] = []
-        res[day]['Time'] = []
+        print('Assessing memory usage...')
+        res[day]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
+        print('{} MB'.format(res[day]['Memory']))
+
+        print('Starting {} runs'.format(n))
+        res[day]['Time'] = [None for i in range(n)]
+        total_time = 0
         for i in range(n):
-            res[day]['Memory'].append(memory_usage((DUT,(),{'input': input}), max_usage=True)[0])
             cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
             stats = pstats.Stats('cstats')
-            res[day]['Time'].append(extract_time(stats, DUT))
+            t = extract_time(stats, DUT)
+            total_time += t
+            res[day]['Time'][i] = t
+        avg_time = total_time / n
+        print('{:.1f} ms average'.format(avg_time))
 
     return res
 
@@ -36,6 +46,7 @@ def get_input(day):
     glob = 'day{}*.txt'.format(day)
     file = [f for f in Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017').glob(glob)][0]
     with open(file, 'r') as f:
+        print('Getting input from {}'.format(file.name))
         return f.read()
 
 def extract_time(pstats, func_handle):
@@ -60,6 +71,6 @@ def pstats_to_df(stats_obj):
     return df
 
 if __name__ == '__main__':
-    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
+    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'), 1000)
     # prof = profile_repo(Path(r'Q:\AOC\Solutions'))
     print(prof)
