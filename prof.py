@@ -5,7 +5,7 @@ import cProfile
 import pstats
 import sys
 
-def profile_repo(repo_path, n=3):
+def profile_repo(repo_path, n=1):
     # repo_path should be a Path object and needs to have register.py in the root directory
 
     sys.path.insert(0, str(repo_path))
@@ -60,6 +60,6 @@ def pstats_to_df(stats_obj):
     return df
 
 if __name__ == '__main__':
-    # prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
-    prof = profile_repo(Path(r'Q:\AOC\Solutions'))
+    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
+    # prof = profile_repo(Path(r'Q:\AOC\Solutions'))
     print(prof)
