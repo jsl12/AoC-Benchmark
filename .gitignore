@@ -2,4 +2,5 @@ __pycache__
 venv
 .idea
 scratch*.py
+users.ini
 cstats
