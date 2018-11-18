@@ -3,26 +3,32 @@ import pandas as pd
 from memory_profiler import memory_usage
 import cProfile
 import pstats
+import sys
 
-from register import REGISTRATION
+def profile_repo(repo_path, n=3):
+    # repo_path should be a Path object and needs to have register.py in the root directory
 
-def profile_repo(repo_path):
+    sys.path.insert(0, str(repo_path))
+    from register import REGISTRATION
+    sys.path.pop(0)
+
     res = {}
     for day in REGISTRATION:
-        print('Profiling {}'.format(day))
+        print('Profiling {}...'.format(day))
+
         res[day] = {}
 
         DUT = REGISTRATION[day]
 
         input = get_input(1)
 
-        res[day]['Memory'] = memory_usage((DUT,(),{'input': input}), max_usage=True)[0]
-        print('Memory used: {}'.format(res[day]['Memory']))
-
-        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
-        stats = pstats.Stats('cstats')
-        stats.print_stats()
-        parse_pstats(stats)
+        res[day]['Memory'] = []
+        res[day]['Time'] = []
+        for i in range(n):
+            res[day]['Memory'].append(memory_usage((DUT,(),{'input': input}), max_usage=True)[0])
+            cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
+            stats = pstats.Stats('cstats')
+            res[day]['Time'].append(extract_time(stats, DUT))
 
     return res
 
@@ -32,12 +38,12 @@ def get_input(day):
     with open(file, 'r') as f:
         return f.read()
 
-def extract_time(pstats, func):
+def extract_time(pstats, func_handle):
     for func in pstats.stats:
-        if func.__name__ == func[2]:
+        if func_handle.__name__ == func[2]:
             return pstats.stats[func][3] * 1000
 
-def parse_pstats(stats_obj):
+def pstats_to_df(stats_obj):
     df = pd.DataFrame({
         'paths': [Path(func[0]) for func in stats_obj.stats],
         'lines': [func[1] for func in stats_obj.stats],
@@ -54,5 +60,6 @@ def parse_pstats(stats_obj):
     return df
 
 if __name__ == '__main__':
-    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
+    # prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'))
+    prof = profile_repo(Path(r'Q:\AOC\Solutions'))
     print(prof)
