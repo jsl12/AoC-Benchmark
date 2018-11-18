@@ -2,6 +2,7 @@ from pathlib import Path
 import cProfile
 import pstats
 import sys
+import pickle
 
 import pandas as pd
 from memory_profiler import memory_usage
@@ -29,9 +30,9 @@ def profile_repo(repo_path, n=5):
 
         print('Assessing memory usage...')
         res[day]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
-        print('{} MB'.format(res[day]['Memory']))
+        print('{:.2f} MB'.format(res[day]['Memory']))
 
-        print('Starting {} runs'.format(n))
+        print('Starting {} runs...'.format(n))
         res[day]['Time'] = [None for i in range(n)]
         total_time = 0
         for i in range(n):
@@ -74,6 +75,5 @@ def pstats_to_df(stats_obj):
     return df
 
 if __name__ == '__main__':
-    prof = profile_repo(Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code'), 1000)
-    # prof = profile_repo(Path(r'Q:\AOC\Solutions'))
-    print(prof)
+    with open('res.pickle', 'wb') as file:
+        pickle.dump(profile_repo(Path(sys.argv[1]), n=100), file)
