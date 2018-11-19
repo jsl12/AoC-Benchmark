@@ -4,12 +4,18 @@ import pstats
 import sys
 import pickle
 
+import click
 import pandas as pd
 from memory_profiler import memory_usage
 
 INPUT_PATH = Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017')
 
-def profile_repo(repo_path, n=5):
+
+@click.command()
+@click.option('--repo_path', type=Path, required=True, help='Path to register.py')
+@click.option('--input_path', type=Path, required=True, help='Path to folder containing input files. glob: \'day*{}*.txt\'')
+@click.option('--n', default=100, help='Number of times to run during the time profile')
+def profile_repo(repo_path, input_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
 
     sys.path.insert(0, str(repo_path))
@@ -76,4 +82,4 @@ def pstats_to_df(stats_obj):
 
 if __name__ == '__main__':
     with open('res.pickle', 'wb') as file:
-        pickle.dump(profile_repo(Path(sys.argv[1]), n=100), file)
+        pickle.dump(profile_repo(), file)
