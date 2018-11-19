@@ -3,3 +3,4 @@ venv
 .idea
 scratch*.py
 cstats
+*.egg-info
