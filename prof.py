@@ -12,11 +12,31 @@ INPUT_PATH = Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent
 
 
 @click.command()
-@click.option('--repo_path', type=Path, required=True, help='Path to register.py')
-@click.option('--input_path', type=Path, required=True, help='Path to folder containing input files. glob: \'day*{}*.txt\'')
-@click.option('--n', default=100, help='Number of times to run during the time profile')
+@click.option(
+    '-rp',
+    '--repo_path',
+    required=True,
+    type=Path,
+    help='Path containing register.py'
+)
+@click.option(
+    '-ip',
+    '--input_path',
+    required=True,
+    type=Path,
+    help='Path to folder containing input files. glob: \'day*{}*.txt\''
+)
+@click.option(
+    '-n',
+    type=int,
+    default=100,
+    show_default=True,
+    help='Number of times to run cProfile'
+)
 def profile_repo(repo_path, input_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
+    # input path should be a Path object and should have files that match the glob day*{}*.txt
+    # n is the number of times to run cProfile
 
     sys.path.insert(0, str(repo_path))
     from register import REGISTRATION
