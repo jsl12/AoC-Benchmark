@@ -3,14 +3,19 @@ import venvbuild
 import os
 import configparser
 import click
+import logging
+
+
 
 def build_env(giturl, git_dir, venv_dir):
     gitsync.sync_repo(giturl, git_dir)
     venvbuild.create_venv(venv_dir)
+
     user_reqs = os.path.join(git_dir, 'requirements.txt')
-    if os.path.isfile(user_reqs):
-        logging.info('Installing from {}'.format(user_reqs))
-        venvbuild.pip_install_requirements(venv_dir, user_reqs)
+    venvbuild.pip_install_requirements(venv_dir, user_reqs)
+
+    profiler_reqs = 'profiler_requirements.txt'
+    venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
 @click.command()
@@ -25,4 +30,5 @@ def from_users_ini(users):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     from_users_ini()
