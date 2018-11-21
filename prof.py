@@ -4,13 +4,36 @@ import pstats
 import sys
 import pickle
 
+import click
 import pandas as pd
 from memory_profiler import memory_usage
 
-INPUT_PATH = Path(r'C:\Users\lanca_000\Documents\Software\Python\Practice\Advent of Code\2017')
-
-def profile_repo(repo_path, n=5):
+@click.command()
+@click.option(
+    '-rp',
+    '--repo_path',
+    required=True,
+    type=Path,
+    help='Path containing register.py'
+)
+@click.option(
+    '-ip',
+    '--input_path',
+    required=True,
+    type=Path,
+    help='Path to folder containing input files. glob: \'day*{}*.txt\''
+)
+@click.option(
+    '-n',
+    type=int,
+    default=100,
+    show_default=True,
+    help='Number of times to run cProfile'
+)
+def profile_repo(repo_path, input_path, n=5):
     # repo_path should be a Path object and needs to have register.py in the root directory
+    # input path should be a Path object and should have files that match the glob day*{}*.txt
+    # n is the number of times to run cProfile
 
     sys.path.insert(0, str(repo_path))
     from register import REGISTRATION
@@ -26,7 +49,7 @@ def profile_repo(repo_path, n=5):
         DUT = REGISTRATION[day]
         print('Registered solution function: {}.{}'.format(DUT.__module__, DUT.__name__))
 
-        input = get_input(1)
+        input = get_input(1, input_path)
 
         print('Assessing memory usage...')
         res[day]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
@@ -46,9 +69,9 @@ def profile_repo(repo_path, n=5):
 
     return res
 
-def get_input(day):
+def get_input(day, path):
     glob = 'day*{}*.txt'.format(day)
-    file = [f for f in INPUT_PATH.glob(glob)][0]
+    file = [f for f in path.glob(glob)][0]
     with open(file, 'r') as f:
         print('Getting input from {}'.format(file.name))
         return f.read()
@@ -76,4 +99,4 @@ def pstats_to_df(stats_obj):
 
 if __name__ == '__main__':
     with open('res.pickle', 'wb') as file:
-        pickle.dump(profile_repo(Path(sys.argv[1]), n=100), file)
+        pickle.dump(profile_repo(), file)
