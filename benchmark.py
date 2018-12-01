@@ -23,11 +23,19 @@ def build_env(giturl, git_dir, venv_dir):
 def from_users_ini(users):
     cfg = configparser.ConfigParser() #TODO refactor out configparser into a seperate func
     cfg.read(users)
-    for user in cfg.sections():
+    usernames = [s for s in cfg.sections() if s != 'Config']
+
+    logging.info('Fetching Inputs')
+    gitsync.sync_repo(cfg['Config']['INPUT_REPO_URL'].strip(), 'AoC-Inputs')
+
+    for user in usernames:
         logging.info('Building environment for {}')
+        git_url = cfg[user]['REPO_URL'].strip()
         git_path = user + '_repo'
         venv_path = user + '_venv'
-        build_env(cfg[user]['REPO_URL'].strip(), git_path, venv_path)
+        build_env(git_url, git_path, venv_path)
+
+
 
 
 if __name__ == "__main__":

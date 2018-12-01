@@ -13,6 +13,7 @@ def sync_repo(repo_url, dest_dir):
             g = git.cmd.Git(dest_dir)
             g.pull()
             #TODO get this working
+            return None
     return repo.working_dir
 
 
