@@ -1,0 +1,4 @@
+Click
+GitPython
+virtualenv
+virtualenvwrapper-win
