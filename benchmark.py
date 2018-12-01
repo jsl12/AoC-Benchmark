@@ -21,12 +21,13 @@ def build_env(giturl, git_dir, venv_dir):
 @click.command()
 @click.option('--users', help='users.ini file')
 def from_users_ini(users):
-    cfg = configparser.ConfigParser()
+    cfg = configparser.ConfigParser() #TODO refactor out configparser into a seperate func
     cfg.read(users)
     for user in cfg.sections():
+        logging.info('Building environment for {}')
         git_path = user + '_repo'
         venv_path = user + '_venv'
-        build_env(cfg[user]['REPO_URL'], git_path, venv_path)
+        build_env(cfg[user]['REPO_URL'].strip(), git_path, venv_path)
 
 
 if __name__ == "__main__":
