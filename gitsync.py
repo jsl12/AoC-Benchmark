@@ -10,7 +10,9 @@ def sync_repo(repo_url, dest_dir):
     except git.exc.GitCommandError as e:
         if e.status == 128:
             logging.info('   Syncing {} to {}'.format(repo_url, dest_dir))
-            repo = git.Repo.init(dest_dir)
+            g = git.cmd.Git(dest_dir)
+            g.pull()
+            #TODO get this working
     return repo.working_dir
 
 
