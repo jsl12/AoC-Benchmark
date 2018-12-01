@@ -49,7 +49,9 @@ def profile_repo(repo_path, input_path, n=5):
         DUT = REGISTRATION[day]
         print('Registered solution function: {}.{}'.format(DUT.__module__, DUT.__name__))
 
-        input = get_input(1, input_path)
+        year = int(day.split('.')[0])
+        d = int(day.split('.')[1])
+        input = get_input(year, d, input_path)
 
         print('Assessing memory usage...')
         res[day]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
@@ -69,8 +71,8 @@ def profile_repo(repo_path, input_path, n=5):
 
     return res
 
-def get_input(day, path):
-    glob = 'day*{}*.txt'.format(day)
+def get_input(year, day, path):
+    glob = '{}/*day*{}*.txt'.format(year, day)
     file = [f for f in path.glob(glob)][0]
     with open(file, 'r') as f:
         print('Getting input from {}'.format(file.name))

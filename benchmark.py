@@ -42,7 +42,7 @@ def from_users_ini(users):
 
         logging.info('Computing benchmarks for {}'.format(user))
 
-        run_profiler(venv_path, git_path, os.path.join(INPUTS_DIR, '2017')) #TODO 2017 hardcoded
+        run_profiler(venv_path, git_path, INPUTS_DIR)
 
 
 if __name__ == "__main__":
