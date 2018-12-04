@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import stats
+import click
+import sys
 
 def stat_plot(df, fig_path='stats.png', save=True):
     plt.rc('font', size=14)
@@ -61,20 +63,26 @@ def add_func_title(ax, func):
         func.__name__
     ))
 
-def collect_and_plot(*args, fig_path='stats.png'):
-    start, df = stats.collect_dataframe(*args)
+@click.command()
+@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
+@click.option('-fp', '--fig_path', type=click.Path(), default='stats.png')
+@click.option('-n', type=int, default=100)
+@click.option('-s', type=int, default=-1)
+def collect_and_plot(input_path, sol_path, s, n, fig_path):
+    sys.path.insert(0, str(sol_path))
+    from register import REGISTRATION
+    sys.path.pop(0)
+
+    start, df = stats.collect_dataframe(
+        REGISTRATION[s],
+        input_path,
+        n
+    )
     fig = stat_plot(df, fig_path, save=False)
-    add_func_title(fig.axes[0], args[0][1])
+    add_func_title(fig.axes[0], REGISTRATION[s][1])
     fig.savefig(fig_path)
     plt.close(fig)
 
 if __name__ == '__main__':
-    from register import REGISTRATION
-    from pathlib import Path
-
-    collect_and_plot(
-        REGISTRATION[-1],
-        Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'),
-        50,
-        fig_path='stats.png'
-    )
+    collect_and_plot()
