@@ -9,8 +9,10 @@ def stat_plot(df, res_path='stats.png'):
         right=.97,
         left=.05
     )
-    ax.plot(df, '.')
     ax.grid(True)
+
+    ax.plot(df, '.')
+    add_std_lines(ax, df)
 
     ax.set_ylabel(df.columns[0])
     auto_size_y(ax, df)
@@ -28,6 +30,17 @@ def auto_size_y(ax, df):
         if max_val > s:
             ax.set_ylim(0, sizes[i])
             return
+
+def add_std_lines(ax, df):
+    mean = df.mean()[0]
+    std = df.std()[0]
+
+    new_mean = df[df < (mean + std)].mean()[0]
+
+    ax.axhline(mean, color='r')
+    ax.axhline(new_mean, color='g')
+    ax.axhline(mean + std, color='r', linestyle='--')
+    ax.axhline(mean - std, color='r', linestyle='--')
 
 if __name__ == '__main__':
     from stats import collect_dataframe
