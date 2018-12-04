@@ -55,18 +55,18 @@ def add_report_box(ax, df):
         transform=ax.transAxes
     )
 
-def collect_and_plot(*args, fig_path='stats.png'):
-    start, df = stats.collect_dataframe(*args)
-    fig = stat_plot(df, fig_path, save=False)
-    ax = fig.axes[0]
-    func = args[0][1]
+def add_func_title(ax, func):
     ax.set_title('{}.{}'.format(
         func.__module__,
         func.__name__
     ))
+
+def collect_and_plot(*args, fig_path='stats.png'):
+    start, df = stats.collect_dataframe(*args)
+    fig = stat_plot(df, fig_path, save=False)
+    add_func_title(fig.axes[0], args[0][1])
     fig.savefig(fig_path)
     plt.close(fig)
-    return
 
 if __name__ == '__main__':
     from register import REGISTRATION
