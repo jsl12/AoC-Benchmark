@@ -18,6 +18,7 @@ def stat_plot(df, res_path='stats.png'):
     ax.set_xlim(0, df.index[-1])
 
     fig.savefig(res_path)
+    print('Saved {}'.format(res_path))
     plt.close(fig)
 
 def auto_size_y(ax, df):
@@ -36,6 +37,6 @@ if __name__ == '__main__':
     start, df = collect_dataframe(
         REGISTRATION[-1],
         Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'),
-        10
+        100
     )
     stat_plot(df)

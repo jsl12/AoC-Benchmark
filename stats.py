@@ -9,6 +9,8 @@ from datetime import datetime
 import prof
 
 def collect_stats(solution, input_path, n=1000):
+    print('Collecting stats on:\n{}.{}'.format(solution[1].__module__, solution[1].__name__))
+    print('{} runs'.format(n))
     input = prof.get_input(solution[0], input_path)
     res = np.empty(n)
     start = datetime.now()
