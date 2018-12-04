@@ -9,13 +9,7 @@ from datetime import datetime
 import prof
 
 def collect_stats(solution, input_path, n=1000):
-    inputs = solution[0].split('.')
-    year = int(inputs[0])
-    day = int(inputs[1])
-    input_file = [f for f in input_path.glob('{}/*day*{}*.txt'.format(year, day))][0]
-    with open(input_file, 'r') as file:
-        input = file.read()
-
+    input = prof.get_input(solution[0], input_path)
     res = np.empty(n)
     start = datetime.now()
     for i in range(n):
@@ -33,7 +27,7 @@ def collect_dataframe(*args):
 
 if __name__ == '__main__':
     from register import REGISTRATION
-    start, df = collect_dataframe(REGISTRATION[-1], Path(r'C:\Users\lancasj\Documents\Python\AoC-Benchmark\AoC-Inputs'), 10)
+    start, df = collect_dataframe(REGISTRATION[-1], Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'), 10)
     print(df.mean()[0])
     df.to_csv('stats.csv')
     # for t in times: print(t)
