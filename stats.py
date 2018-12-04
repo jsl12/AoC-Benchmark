@@ -18,6 +18,7 @@ def collect_stats(solution, input_path, n=1000):
         stats = pstats.Stats('cstats')
         t = prof.extract_time(stats, solution[1])
         res[i] = t
+        print('Run {} {:.1f} ms'.format(i, t))
     end = datetime.now()
     print('Elapsed time: {}'.format(end - start))
     return res
@@ -25,21 +26,23 @@ def collect_stats(solution, input_path, n=1000):
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
 @click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
-@click.option('-csv', '--csv_path', type=click.Path(), default='stats.csv')
-@click.option('-n', type=int, default=100)
-@click.option('-s', type=int, default=-1)
-def collect_dataframe(input_path, sol_path, s, n, csv_path):
+@click.option('-csv', '--csv_path', type=click.Path(), default=None)
+@click.option('-s', '--func_select', type=int, default=-1)
+@click.option('-n', '--num', type=int, default=100)
+def collect_dataframe(input_path, sol_path, csv_path, func_select, num):
     sys.path.insert(0, str(sol_path))
     from register import REGISTRATION
     sys.path.pop(0)
 
     res = collect_stats(
-        REGISTRATION[s],
+        REGISTRATION[func_select],
         input_path,
-        n
+        num
     )
     df = pd.DataFrame(res, columns=['Execution Duration [ms]'])
     df.index.name = 'Run #'
+    if csv_path is not None:
+        df.to_csv(csv_path)
     return df
 
 if __name__ == '__main__':
