@@ -8,3 +8,4 @@ users.*
 cstats
 *.egg-info
 *.png
+*.csv
