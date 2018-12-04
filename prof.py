@@ -40,32 +40,41 @@ def profile_repo(repo_path, input_path, n=5):
     sys.path.pop(0)
 
     res = {}
-    for day in REGISTRATION:
+    for id, DUT in REGISTRATION:
         # print('Starting profile of {}'.format(day))
-        print(' {} '.format(day).center(50, '='))
+        print(' {} '.format(id).center(50, '='))
 
-        res[day] = {}
+        res[id] = {}
 
-        DUT = REGISTRATION[day]
         print('Registered solution function: {}.{}'.format(DUT.__module__, DUT.__name__))
 
-        year = int(day.split('.')[0])
-        d = int(day.split('.')[1])
+        year = int(id.split('.')[0])
+        d = int(id.split('.')[1])
         input = get_input(year, d, input_path)
 
         print('Assessing memory usage...')
-        res[day]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
-        print('{:.2f} MB'.format(res[day]['Memory']))
+        res[id]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
+        print('{:.2f} MB'.format(res[id]['Memory']))
+
+        print('Initial solution run:')
+        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
+        stats = pstats.Stats('cstats')
+        t = extract_time(stats, DUT)
+        print('{:.1f} ms'.format(t))
+
+        if t > 100:
+            n = int(60000 / t)
+            print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
-        res[day]['Time'] = [None for i in range(n)]
+        res[id]['Time'] = [None for i in range(n)]
         total_time = 0
         for i in range(n):
             cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
             stats = pstats.Stats('cstats')
             t = extract_time(stats, DUT)
             total_time += t
-            res[day]['Time'][i] = t
+            res[id]['Time'][i] = t
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
