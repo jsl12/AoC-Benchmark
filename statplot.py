@@ -1,7 +1,14 @@
 import matplotlib.pyplot as plt
 
 def stat_plot(df, res_path='stats.png'):
+    plt.rc('font', size=14)
     fig, ax = plt.subplots(figsize=(19.2, 10.8))
+    plt.subplots_adjust(
+        top=.95,
+        bottom=.05,
+        right=.97,
+        left=.05
+    )
     ax.plot(df, '.')
     ax.grid(True)
 
@@ -29,6 +36,6 @@ if __name__ == '__main__':
     start, df = collect_dataframe(
         REGISTRATION[-1],
         Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'),
-        20
+        10
     )
     stat_plot(df)
