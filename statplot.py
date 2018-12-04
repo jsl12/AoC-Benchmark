@@ -73,8 +73,7 @@ def collect_and_plot(input_path, sol_path, s, n, fig_path):
     sys.path.insert(0, str(sol_path))
     from register import REGISTRATION
     sys.path.pop(0)
-
-    start, df = stats.collect_dataframe(
+    df = stats.collect_dataframe(
         REGISTRATION[s],
         input_path,
         n
