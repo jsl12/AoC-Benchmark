@@ -40,7 +40,7 @@ def profile_repo(repo_path, input_path, n=5):
     sys.path.pop(0)
 
     res = {}
-    for id, DUT  in REGISTRATION:
+    for id, DUT in REGISTRATION:
         # print('Starting profile of {}'.format(day))
         print(' {} '.format(id).center(50, '='))
 
@@ -55,6 +55,16 @@ def profile_repo(repo_path, input_path, n=5):
         print('Assessing memory usage...')
         res[id]['Memory'] = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
         print('{:.2f} MB'.format(res[id]['Memory']))
+
+        print('Initial solution run:')
+        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
+        stats = pstats.Stats('cstats')
+        t = extract_time(stats, DUT)
+        print('{:.1f} ms'.format(t))
+
+        if t > 100:
+            n = int(60000 / t)
+            print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
         res[id]['Time'] = [None for i in range(n)]
