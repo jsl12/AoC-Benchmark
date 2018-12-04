@@ -25,7 +25,15 @@ def collect_stats(solution, input_path, n=1000):
         res[i] = t
     return start, res
 
+def collect_dataframe(*args):
+    start, res = collect_stats(*args)
+    df = pd.DataFrame(res, columns=['Execution Duration [ms]'])
+    df.index.name = 'Run #'
+    return start, df
+
 if __name__ == '__main__':
     from register import REGISTRATION
-    start, times = collect_stats(REGISTRATION[-1], Path(r'C:\Users\lancasj\Documents\Python\AoC-Benchmark\AoC-Inputs'), 10)
-    for t in times[:5]: print(t)
+    start, df = collect_dataframe(REGISTRATION[-1], Path(r'C:\Users\lancasj\Documents\Python\AoC-Benchmark\AoC-Inputs'), 10)
+    print(df.mean()[0])
+    df.to_csv('stats.csv')
+    # for t in times: print(t)
