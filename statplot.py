@@ -17,7 +17,9 @@ def stat_plot(df, res_path='stats.png'):
     ax.set_ylabel(df.columns[0])
     auto_size_y(ax, df)
 
-    ax.set_xlim(0, df.index[-1])
+    ax.set_xlim(0, ax.get_xlim()[1])
+
+    add_report_box(ax, df)
 
     fig.savefig(res_path)
     print('Saved {}'.format(res_path))
@@ -41,6 +43,13 @@ def add_std_lines(ax, df):
     ax.axhline(new_mean, color='g')
     ax.axhline(mean + std, color='r', linestyle='--')
     ax.axhline(mean - std, color='r', linestyle='--')
+
+def add_report_box(ax, df):
+    ax.text(
+        .02, .95,
+        '{} runs\n{:.1f} ms avg'.format(df.index.size, df.mean()[0]),
+        transform=ax.transAxes
+    )
 
 if __name__ == '__main__':
     from stats import collect_dataframe
