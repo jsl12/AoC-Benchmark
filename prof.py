@@ -83,7 +83,7 @@ def get_input(id, path):
     glob = '{}/*day*{}*.txt'.format(id[0], id[1])
     file = [f for f in path.glob(glob)][0]
     with open(file, 'r') as f:
-        print('Getting input from {}'.format(file.name))
+        print('Getting input from {}/{}'.format(file.parents[0].name, file.name))
         return f.read()
 
 def extract_time(pstats, func_handle):
