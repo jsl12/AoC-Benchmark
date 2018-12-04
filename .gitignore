@@ -2,6 +2,6 @@ __pycache__
 .idea
 scratch/
 scratch*.py
-users.yaml
+users.*
 cstats
 *.egg-info
