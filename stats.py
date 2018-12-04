@@ -1,12 +1,11 @@
-from pathlib import Path
 import cProfile
 import pstats
 import sys
-import pickle
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import prof
+import click
 
 def collect_stats(solution, input_path, n=1000):
     print('Collecting stats on:\n{}.{}'.format(solution[1].__module__, solution[1].__name__))
@@ -23,15 +22,25 @@ def collect_stats(solution, input_path, n=1000):
     print('Elapsed time: {}'.format(end - start))
     return res
 
-def collect_dataframe(*args):
-    res = collect_stats(*args)
+@click.command()
+@click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
+@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-csv', '--csv_path', type=click.Path(), default='stats.csv')
+@click.option('-n', type=int, default=100)
+@click.option('-s', type=int, default=-1)
+def collect_dataframe(input_path, sol_path, s, n, csv_path):
+    sys.path.insert(0, str(sol_path))
+    from register import REGISTRATION
+    sys.path.pop(0)
+
+    res = collect_stats(
+        REGISTRATION[s],
+        input_path,
+        n
+    )
     df = pd.DataFrame(res, columns=['Execution Duration [ms]'])
     df.index.name = 'Run #'
     return df
 
 if __name__ == '__main__':
-    from register import REGISTRATION
-    df = collect_dataframe(REGISTRATION[-1], Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'), 10)
-    print(df.mean()[0])
-    df.to_csv('stats.csv')
-    # for t in times: print(t)
+    collect_dataframe()
