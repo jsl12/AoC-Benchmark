@@ -1,7 +1,7 @@
 import gitsync
 import venvbuild
 import os
-import configparser
+import yaml
 import click
 import logging
 import subprocess
@@ -24,23 +24,22 @@ def run_profiler(venv_dir, user_src_dir, inputs_dir):
     subprocess.run(cmd)
 
 @click.command()
-@click.option('--users', help='users.ini file')
+@click.option('--users', help='users.yaml file')
 def from_users_ini(users):
-    cfg = configparser.ConfigParser() #TODO refactor out configparser into a seperate func
-    cfg.read(users)
-    usernames = [s for s in cfg.sections() if s != 'Config']
+    cfg = yaml.load(open(users, 'r'))
 
     logging.info('Fetching Inputs')
-    gitsync.sync_repo(cfg['Config']['INPUT_REPO_URL'].strip(), INPUTS_DIR)
+    gitsync.sync_repo(cfg['input']['repo_url'], INPUTS_DIR)
 
-    for user in usernames:
-        logging.info('Building environment for {}')
-        git_url = cfg[user]['REPO_URL'].strip()
-        git_path = user + '_repo'
-        venv_path = user + '_venv'
-        build_env(git_url, git_path, venv_path)
+    for u in cfg['users']:
+        username = list(u)[0]
+        user = u[username]
+        logging.info('Building environment for {}'.format(username))
+        git_path = username + '_repo'
+        venv_path = username + '_venv'
+        build_env(user['repo_url'], git_path, venv_path)
 
-        logging.info('Computing benchmarks for {}'.format(user))
+        logging.info('Computing benchmarks for {}'.format(username))
 
         run_profiler(venv_path, git_path, INPUTS_DIR)
 

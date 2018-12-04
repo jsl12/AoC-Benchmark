@@ -2,3 +2,4 @@ Click
 GitPython
 virtualenv
 virtualenvwrapper-win
+PyYAML

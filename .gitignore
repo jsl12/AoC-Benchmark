@@ -4,6 +4,6 @@ __pycache__
 *inputs
 .idea
 scratch*.py
-users.ini
+users.yaml
 cstats
 *.egg-info
