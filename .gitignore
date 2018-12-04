@@ -1,8 +1,6 @@
 __pycache__
-*venv
-*repo
-*inputs
 .idea
+scratch/
 scratch*.py
 users.yaml
 cstats
