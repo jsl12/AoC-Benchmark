@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import stats
 
-def stat_plot(df, fig_path='stats.png'):
+def stat_plot(df, fig_path='stats.png', save=True):
     plt.rc('font', size=14)
     fig, ax = plt.subplots(figsize=(19.2, 10.8))
     plt.subplots_adjust(
@@ -22,9 +22,12 @@ def stat_plot(df, fig_path='stats.png'):
 
     add_report_box(ax, df)
 
-    fig.savefig(fig_path)
-    print('Saved {}'.format(fig_path))
-    plt.close(fig)
+    if save:
+        fig.savefig(fig_path)
+        print('Saved {}'.format(fig_path))
+        plt.close(fig)
+    else:
+        return fig
 
 def auto_size_y(ax, df):
     sizes = [5000, 1000, 500, 250, 100, 50, 10]
@@ -54,7 +57,16 @@ def add_report_box(ax, df):
 
 def collect_and_plot(*args, fig_path='stats.png'):
     start, df = stats.collect_dataframe(*args)
-    stat_plot(df, fig_path)
+    fig = stat_plot(df, fig_path, save=False)
+    ax = fig.axes[0]
+    func = args[0][1]
+    ax.set_title('{}.{}'.format(
+        func.__module__,
+        func.__name__
+    ))
+    fig.savefig(fig_path)
+    plt.close(fig)
+    return
 
 if __name__ == '__main__':
     from register import REGISTRATION
@@ -63,6 +75,6 @@ if __name__ == '__main__':
     collect_and_plot(
         REGISTRATION[-1],
         Path(r'C:\Users\lanca_000\Documents\Software\Python\AoC Benchmark\AoC-Inputs'),
-        100,
+        50,
         fig_path='stats.png'
     )
