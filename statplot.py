@@ -32,7 +32,7 @@ def stat_plot(df, fig_path='stats.png', save=True):
         return fig
 
 def auto_size_y(ax, df):
-    sizes = [5000, 1000, 500, 250, 100, 50, 10]
+    sizes = [5000, 2500, 1000, 500, 250, 100, 50, 10]
     max_val = df.max()[0]
     for i, s in enumerate(sizes[1:]):
         if max_val > s:
