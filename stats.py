@@ -1,6 +1,7 @@
 import cProfile
 import pstats
 import sys
+import os
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -13,7 +14,7 @@ import click
 @click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
 @click.option('-n', '--num', type=int, default=100)
 @click.option('-s', '--func_select', type=int, default=-1)
-@click.option('-c', '--cache', type=click.Path(), default=True)
+@click.option('-c', '--cache', type=bool, default=True)
 def click_collect_dataframe(*args, **kwargs):
     collect_dataframe(*args, **kwargs)
 
@@ -54,11 +55,12 @@ def collect_stats(solution, input_path, n=1000):
 def add_to_cache(df, function):
     cache_path = '{}.{}'.format(function.__module__, function.__name__).replace('.', '-')
     cache_path += '.csv'
-    cache_path = Path(cache_path)
+    cache_path = Path(os.getcwd()) / 'results' / cache_path
     if cache_path.exists():
         df2 = pd.read_csv(cache_path)
         df2 = df2.set_index(df2.columns[0])
-        df = pd.concat([df, df2], axis=0).reset_index()
+        df = pd.concat([df2, df], axis=0)
+        df.index = pd.Index([i for i in range(df.count()[0])], name=df.index.name)
     df.to_csv(cache_path)
 
 if __name__ == '__main__':
