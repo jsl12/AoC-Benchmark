@@ -5,6 +5,9 @@ import sys
 from pathlib import Path
 import pandas as pd
 
+# Globally ups the dpi when a figure gets saved
+plt.rc('savefig', dpi=600)
+
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
 @click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
