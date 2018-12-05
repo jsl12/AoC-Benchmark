@@ -55,7 +55,10 @@ def collect_stats(solution, input_path, n=1000):
 def add_to_cache(df, function):
     cache_path = '{}.{}'.format(function.__module__, function.__name__).replace('.', '-')
     cache_path += '.csv'
-    cache_path = Path(os.getcwd()) / 'results' / cache_path
+    result_folder = Path(os.getcwd()) / 'results'
+    if not result_folder.exists():
+        result_folder.mkdir(parents=True)
+    cache_path =  result_folder / cache_path
     if cache_path.exists():
         df2 = pd.read_csv(cache_path)
         df2 = df2.set_index(df2.columns[0])
