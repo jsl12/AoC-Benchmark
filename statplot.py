@@ -3,6 +3,7 @@ import stats
 import click
 import sys
 from pathlib import Path
+import pandas as pd
 
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
@@ -27,7 +28,7 @@ def collect_and_plot(input_path, sol_path, num, func_select, fig_path=None):
     fig = stat_plot(df, fig_path, save=False)
     add_func_title(fig.axes[0], REGISTRATION[func_select][1])
     if fig_path is None:
-        fig_path = '{}.{}_n{}'.format(
+        fig_path = 'results\{}.{}_n{}'.format(
             REGISTRATION[func_select][1].__module__,
             REGISTRATION[func_select][1].__name__,
             num
@@ -61,7 +62,7 @@ def load_and_plot(load_path, save=False, close=False):
     fig.axes[0].set_title(load_path.stem.replace('-', ' '))
 
     if save:
-        fig.savefig(load_path.parents[0] / (load_path.stem + '.png'))
+        fig.savefig(load_path.parents[0] / (load_path.stem + '_n{}.png'.format(df.count()[0])))
 
     # This is helpful if you're going to be making a lot of plots in a row
     if close:
