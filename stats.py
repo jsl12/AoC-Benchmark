@@ -7,22 +7,6 @@ from datetime import datetime
 import prof
 import click
 
-def collect_stats(solution, input_path, n=1000):
-    print('Collecting stats on:\n{}.{}'.format(solution[1].__module__, solution[1].__name__))
-    print('{} runs'.format(n))
-    input = prof.get_input(solution[0], input_path)
-    res = np.empty(n)
-    start = datetime.now()
-    for i in range(n):
-        cProfile.runctx('solution[1](input)', globals=globals(), locals=locals(), filename='cstats')
-        stats = pstats.Stats('cstats')
-        t = prof.extract_time(stats, solution[1])
-        res[i] = t
-        print('Run {} {:.1f} ms'.format(i, t))
-    end = datetime.now()
-    print('Elapsed time: {}'.format(end - start))
-    return res
-
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
 @click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
@@ -47,6 +31,22 @@ def collect_dataframe(input_path, sol_path, num, csv_path=None, func_select=-1):
     if csv_path is not None:
         df.to_csv(csv_path)
     return df
+
+def collect_stats(solution, input_path, n=1000):
+    print('Collecting stats on:\n{}.{}'.format(solution[1].__module__, solution[1].__name__))
+    print('{} runs'.format(n))
+    input = prof.get_input(solution[0], input_path)
+    res = np.empty(n)
+    start = datetime.now()
+    for i in range(n):
+        cProfile.runctx('solution[1](input)', globals=globals(), locals=locals(), filename='cstats')
+        stats = pstats.Stats('cstats')
+        t = prof.extract_time(stats, solution[1])
+        res[i] = t
+        print('Run {} {:.1f} ms'.format(i, t))
+    end = datetime.now()
+    print('Elapsed time: {}'.format(end - start))
+    return res
 
 if __name__ == '__main__':
     click_collect_dataframe()
