@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import stats
 import click
 import sys
+from pathlib import Path
 
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
@@ -34,6 +35,39 @@ def collect_and_plot(input_path, sol_path, num, func_select, fig_path=None):
     fig.savefig(fig_path)
     print('Saved to:\n{}'.format(fig_path))
     plt.close(fig)
+
+def load_and_plot(load_path, save=False, close=False):
+    # Loads a DataFrame from the CSV at the load_path, which can be either a string
+    # or a Path object. It also has the option to save, in which case a PNG file is
+    # created with the same stem as the original CSV file in the same location.
+
+    # Assures correct input
+    if isinstance(load_path, str):
+        try:
+            load_path = Path(load_path)
+        except:
+            print('Could not make a Path object from string')
+            raise
+    else:
+        assert isinstance(load_path, Path), 'load_path must be a Path object or a string that can be made into one'
+    assert load_path.exists(), 'load_path must exist'
+    assert load_path.suffix == '.csv', 'load_path must point to a CSV file'
+
+
+    df = pd.read_csv(load_path)
+    df = df.set_index(df.columns[0])
+
+    fig = stat_plot(df, save=False)
+    fig.axes[0].set_title(load_path.stem.replace('-', ' '))
+
+    if save:
+        fig.savefig(load_path.parents[0] / (load_path.stem + '.png'))
+
+    # This is helpful if you're going to be making a lot of plots in a row
+    if close:
+        plt.close(fig)
+    else:
+        return fig
 
 def stat_plot(df, fig_path='stats.png', save=True):
     plt.rc('font', size=14)
