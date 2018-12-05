@@ -64,24 +64,36 @@ def add_func_title(ax, func):
     ))
 
 @click.command()
-@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
-@click.option('-fp', '--fig_path', type=click.Path(), default='stats.png')
-@click.option('-n', type=int, default=100)
-@click.option('-s', type=int, default=-1)
-def collect_and_plot(input_path, sol_path, s, n, fig_path):
+@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-n', '--num', type=int, default=100)
+@click.option('-s', '--func_select', type=int, default=-1)
+@click.option('-fp', '--fig_path', type=click.Path(), default=None)
+def click_collect_and_plot(*args, **kwargs):
+    collect_and_plot(*args, **kwargs)
+
+def collect_and_plot(input_path, sol_path, num, func_select, fig_path=None):
     sys.path.insert(0, str(sol_path))
     from register import REGISTRATION
     sys.path.pop(0)
+
     df = stats.collect_dataframe(
-        REGISTRATION[s],
-        input_path,
-        n
+        input_path=input_path,
+        sol_path=sol_path,
+        num=num,
+        func_select=func_select
     )
     fig = stat_plot(df, fig_path, save=False)
-    add_func_title(fig.axes[0], REGISTRATION[s][1])
+    add_func_title(fig.axes[0], REGISTRATION[func_select][1])
+    if fig_path is None:
+        fig_path = '{}.{}_n{}'.format(
+            REGISTRATION[func_select][1].__module__,
+            REGISTRATION[func_select][1].__name__,
+            num
+        ).replace('.', '-') + '.png'
     fig.savefig(fig_path)
+    print('Saved to:\n{}'.format(fig_path))
     plt.close(fig)
 
 if __name__ == '__main__':
-    collect_and_plot()
+    click_collect_and_plot()

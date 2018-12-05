@@ -26,10 +26,13 @@ def collect_stats(solution, input_path, n=1000):
 @click.command()
 @click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
 @click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-n', '--num', type=int, default=100)
 @click.option('-csv', '--csv_path', type=click.Path(), default=None)
 @click.option('-s', '--func_select', type=int, default=-1)
-@click.option('-n', '--num', type=int, default=100)
-def collect_dataframe(input_path, sol_path, csv_path, func_select, num):
+def click_collect_dataframe(*args, **kwargs):
+    collect_dataframe(*args, **kwargs)
+
+def collect_dataframe(input_path, sol_path, num, csv_path=None, func_select=-1):
     sys.path.insert(0, str(sol_path))
     from register import REGISTRATION
     sys.path.pop(0)
@@ -46,4 +49,4 @@ def collect_dataframe(input_path, sol_path, csv_path, func_select, num):
     return df
 
 if __name__ == '__main__':
-    collect_dataframe()
+    click_collect_dataframe()
