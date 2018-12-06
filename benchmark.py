@@ -5,7 +5,7 @@ import click
 import logging
 import subprocess
 
-import gendir
+import cfg
 
 INPUTS_DIR = 'AoC-Inputs'
 
@@ -26,13 +26,13 @@ def build_env(giturl, git_dir, venv_dir):
 
 
 def run_profiler(config_path, username):
-    py_path = gendir.venv(config_path, username) / 'Scripts' / 'python.exe'
+    py_path = cfg.venv(config_path, username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
-        ('rp', gendir.repo(config_path, username)),
-        ('ip', gendir.inputs_dir(config_path)),
+        ('rp', cfg.repo(config_path, username)),
+        ('ip', cfg.inputs_dir(config_path)),
         ('u', username),
-        ('to', gendir.readconfig(config_path)['timeout'])
+        ('to', cfg.readconfig(config_path)['timeout'])
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
@@ -43,15 +43,15 @@ def run_profiler(config_path, username):
 def from_user_config(config_path):
     logging.info('Fetching Inputs')
     gitsync.sync_repo(
-        repo_url=gendir.inputs_repo(config_path),
-        dest_dir=str(gendir.inputs_dir(config_path))
+        repo_url=cfg.inputs_repo(config_path),
+        dest_dir=str(cfg.inputs_dir(config_path))
     )
 
-    cfg = gendir.readconfig(config_path)
+    cfg = cfg.readconfig(config_path)
     for username in cfg['users']:
-        git_url = gendir.repo_url(config_path, username)
-        git_path = gendir.repo(config_path, username)
-        venv_path = gendir.venv(config_path, username)
+        git_url = cfg.repo_url(config_path, username)
+        git_path = cfg.repo(config_path, username)
+        venv_path = cfg.venv(config_path, username)
         build_env(git_url, git_path, venv_path)
 
         logging.info('Running benchmarks for {}'.format(username))

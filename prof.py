@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from memory_profiler import memory_usage
 
-import gendir
+import cfg
 
 @click.command()
 @click.option(
@@ -103,7 +103,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
-    with open(gendir.results(users_config, username), 'wb') as file:
+    with open(cfg.results(users_config, username), 'wb') as file:
         pickle.dump(res, file)
 
     return res
