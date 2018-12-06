@@ -3,11 +3,14 @@ import cProfile
 import pstats
 import sys
 import pickle
+import yaml
 
 import click
 import pandas as pd
 import numpy as np
 from memory_profiler import memory_usage
+
+import gendir
 
 @click.command()
 @click.option(
@@ -31,7 +34,30 @@ from memory_profiler import memory_usage
     show_default=True,
     help='Number of times to run cProfile'
 )
-def profile_repo(repo_path, input_path, n=5):
+@click.option(
+    '-uc',
+    '--users_config',
+    type=Path,
+    default='users.yaml',
+    show_default=True,
+    help='Path to user configuration file'
+)
+@click.option(
+    '-u',
+    '--username',
+    type=str,
+    required=True,
+    help='Username to associate with results'
+)
+@click.option(
+    '-to',
+    '--timeout',
+    type=int,
+    default=10000,
+    show_default=True,
+    help='Timeout in ms. Profiler will try to only run each solution for this long'
+)
+def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     # repo_path should be a Path object and needs to have register.py in the root directory
     # input path should be a Path object and should have files that match the glob day*{}*.txt
     # n is the number of times to run cProfile
@@ -61,8 +87,9 @@ def profile_repo(repo_path, input_path, n=5):
         t = extract_time(stats, DUT)
         print('{:.1f} ms'.format(t))
 
-        if t > 100:
-            n = int(60000 / t)
+        n_timeout = int((timeout - t) / t)
+        if n_timeout < n:
+            n = n_timeout
             print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
@@ -76,6 +103,15 @@ def profile_repo(repo_path, input_path, n=5):
             res[id]['Time'][i] = t
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
+
+    with open(users_config, 'r') as file:
+        cfg = yaml.load(file)
+    cfg['working_dir']
+    res_dir = gendir.result(cfg['working_dir'], username)
+    if not res_dir.exists():
+        res_dir.mkdir()
+    with open(res_dir / 'res.pickle', 'wb') as file:
+        pickle.dump(res, file)
 
     return res
 

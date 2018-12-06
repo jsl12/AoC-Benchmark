@@ -1,3 +1,4 @@
 pandas
 memory_profiler
 Click
+PyYAML
