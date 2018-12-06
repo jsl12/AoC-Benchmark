@@ -1,0 +1,87 @@
+import matplotlib.pyplot as plt
+import stats
+import click
+import sys
+
+def stat_plot(df, fig_path='stats.png', save=True):
+    plt.rc('font', size=14)
+    fig, ax = plt.subplots(figsize=(19.2, 10.8))
+    plt.subplots_adjust(
+        top=.95,
+        bottom=.05,
+        right=.97,
+        left=.05
+    )
+    ax.grid(True)
+
+    ax.plot(df, '.')
+    add_std_lines(ax, df)
+
+    ax.set_ylabel(df.columns[0])
+    auto_size_y(ax, df)
+
+    ax.set_xlim(0, ax.get_xlim()[1])
+
+    add_report_box(ax, df)
+
+    if save:
+        fig.savefig(fig_path)
+        print('Saved {}'.format(fig_path))
+        plt.close(fig)
+    else:
+        return fig
+
+def auto_size_y(ax, df):
+    sizes = [5000, 1000, 500, 250, 100, 50, 10]
+    max_val = df.max()[0]
+    for i, s in enumerate(sizes[1:]):
+        if max_val > s:
+            ax.set_ylim(0, sizes[i])
+            return
+
+def add_std_lines(ax, df):
+    mean = df.mean()[0]
+    std = df.std()[0]
+
+    new_mean = df[df < (mean + std)].mean()[0]
+
+    ax.axhline(mean, color='r')
+    ax.axhline(new_mean, color='g')
+    ax.axhline(mean + std, color='r', linestyle='--')
+    ax.axhline(mean - std, color='r', linestyle='--')
+
+def add_report_box(ax, df):
+    ax.text(
+        .02, .95,
+        '{} runs\n{:.1f} ms avg'.format(df.index.size, df.mean()[0]),
+        transform=ax.transAxes
+    )
+
+def add_func_title(ax, func):
+    ax.set_title('{}.{}'.format(
+        func.__module__,
+        func.__name__
+    ))
+
+@click.command()
+@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
+@click.option('-fp', '--fig_path', type=click.Path(), default='stats.png')
+@click.option('-n', type=int, default=100)
+@click.option('-s', type=int, default=-1)
+def collect_and_plot(input_path, sol_path, s, n, fig_path):
+    sys.path.insert(0, str(sol_path))
+    from register import REGISTRATION
+    sys.path.pop(0)
+    df = stats.collect_dataframe(
+        REGISTRATION[s],
+        input_path,
+        n
+    )
+    fig = stat_plot(df, fig_path, save=False)
+    add_func_title(fig.axes[0], REGISTRATION[s][1])
+    fig.savefig(fig_path)
+    plt.close(fig)
+
+if __name__ == '__main__':
+    collect_and_plot()
