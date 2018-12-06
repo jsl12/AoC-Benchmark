@@ -7,3 +7,4 @@ cstats
 *.egg-info
 *.png
 *.csv
+.ipynb_checkpoints

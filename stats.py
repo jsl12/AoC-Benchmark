@@ -1,11 +1,40 @@
 import cProfile
 import pstats
 import sys
+import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import prof
 import click
+
+@click.command()
+@click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
+@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
+@click.option('-n', '--num', type=int, default=100)
+@click.option('-s', '--func_select', type=int, default=-1)
+@click.option('-c', '--cache', type=bool, default=True)
+def click_collect_dataframe(*args, **kwargs):
+    collect_dataframe(*args, **kwargs)
+
+def collect_dataframe(input_path, sol_path, num, func_select=-1, cache=True):
+    sys.path.insert(0, str(sol_path))
+    from register import REGISTRATION
+    sys.path.pop(0)
+
+    res = collect_stats(
+        REGISTRATION[func_select],
+        input_path,
+        num
+    )
+    df = pd.DataFrame(res, columns=['Execution Duration [ms]'])
+    df.index.name = 'Run #'
+
+    if cache:
+        add_to_cache(df, REGISTRATION[func_select][1])
+
+    return df
 
 def collect_stats(solution, input_path, n=1000):
     print('Collecting stats on:\n{}.{}'.format(solution[1].__module__, solution[1].__name__))
@@ -23,27 +52,19 @@ def collect_stats(solution, input_path, n=1000):
     print('Elapsed time: {}'.format(end - start))
     return res
 
-@click.command()
-@click.option('-ip', '--input_path', type=click.Path(exists=True), required=True)
-@click.option('-sp', '--sol_path', type=click.Path(exists=True), required=True)
-@click.option('-csv', '--csv_path', type=click.Path(), default=None)
-@click.option('-s', '--func_select', type=int, default=-1)
-@click.option('-n', '--num', type=int, default=100)
-def collect_dataframe(input_path, sol_path, csv_path, func_select, num):
-    sys.path.insert(0, str(sol_path))
-    from register import REGISTRATION
-    sys.path.pop(0)
-
-    res = collect_stats(
-        REGISTRATION[func_select],
-        input_path,
-        num
-    )
-    df = pd.DataFrame(res, columns=['Execution Duration [ms]'])
-    df.index.name = 'Run #'
-    if csv_path is not None:
-        df.to_csv(csv_path)
-    return df
+def add_to_cache(df, function):
+    cache_path = '{}.{}'.format(function.__module__, function.__name__).replace('.', '-')
+    cache_path += '.csv'
+    result_folder = Path(os.getcwd()) / 'results'
+    if not result_folder.exists():
+        result_folder.mkdir(parents=True)
+    cache_path =  result_folder / cache_path
+    if cache_path.exists():
+        df2 = pd.read_csv(cache_path)
+        df2 = df2.set_index(df2.columns[0])
+        df = pd.concat([df2, df], axis=0)
+        df.index = pd.Index([i for i in range(df.count()[0])], name=df.index.name)
+    df.to_csv(cache_path)
 
 if __name__ == '__main__':
-    collect_dataframe()
+    click_collect_dataframe()
