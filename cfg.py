@@ -7,11 +7,24 @@ CONFIG_PATH = None
 
 @functools.lru_cache(maxsize=1)
 def readconfig(config_path=None):
+    # The idea here is that you can monkey-patch CONFIG_PATH to initialize and then
+    # avoid having to pass around the path to the config file for subsequent calls.
+    # Setting the cache size to 1 means that every time this function sees a new input
+    # it caches the result.
+    # Usage:
+    #   - readconfig is called with a real path, e.g. users.yaml
+    #   - CONFIG_PATH gets set to the real path
+    #   - readconfig is called again, but without an argument
+    #   - the value of CONFIG_PATH gets used
+    #   - functools caches the result as having come from the input None
+    #   - readconfig is called subsequent times without an argument
+    #   - functools returns the cached result
     global CONFIG_PATH
-    if config_path is None and CONFIG_PATH is not None:
-        config_path = CONFIG_PATH
-    elif config_path is not None:
+
+    if config_path is not None:
         CONFIG_PATH = config_path
+    elif config_path is None and CONFIG_PATH is not None:
+        config_path = CONFIG_PATH
     else:
         assert config_path is not None, 'cfg.CONFIG_PATH was not initialized'
 
