@@ -43,24 +43,21 @@ def inputs_repo(config_path=None):
 def repo_url(username, config_path=None):
     return readconfig(config_path)['users'][username]['repo_url']
 
+def user_dir(username, name, suffix, config_path=None):
+    dir = readconfig(config_path)['users'][username].get(name, None)
+    if dir is None:
+        dir = '{}_{}'.format(username, suffix)
+    res = working_dir(config_path) / dir
+    if not res.exists():
+        res.mkdir()
+    return res
+
 def repo(username, config_path=None):
-    repo_dir = readconfig(config_path)['users'][username].get('repo_local', None)
-    if repo_dir is None:
-        repo_dir = '{}_repo'.format(username)
-    return working_dir(config_path) / repo_dir
+    return user_dir(username, 'repo_local', '_repo', config_path)
 
 def venv(username, config_path=None):
-    venv_dir = readconfig(config_path)['users'][username].get('venv_local', None)
-    if venv_dir is None:
-        venv_dir = '{}_venv'.format(username)
-    return working_dir(config_path) / venv_dir
+    return user_dir(username, 'venv_local', '_venv', config_path)
 
 def results(username, config_path=None):
-    result_dir = readconfig(config_path)['users'][username].get('results', None)
-    if result_dir is None:
-        result_dir = '{}_results'.format(username)
-    result_dir = working_dir(config_path) / result_dir
+    return user_dir(username, 'results', '_results', config_path) / readconfig(config_path)['res_filename']
 
-    if not result_dir.exists():
-        result_dir.mkdir()
-    return result_dir / cfg['res_filename']
