@@ -110,7 +110,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     res_dir = gendir.result(cfg['working_dir'], username)
     if not res_dir.exists():
         res_dir.mkdir()
-    with open(res_dir / 'res.pickle', 'wb') as file:
+    with open(res_dir / cfg['res_filename'], 'wb') as file:
         pickle.dump(res, file)
 
     return res
@@ -147,5 +147,4 @@ def pstats_to_df(stats_obj):
     return df
 
 if __name__ == '__main__':
-    with open('res.pickle', 'wb') as file:
-        pickle.dump(profile_repo(), file)
+    profile_repo()
