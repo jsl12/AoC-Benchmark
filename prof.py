@@ -6,6 +6,7 @@ import pickle
 
 import click
 import pandas as pd
+import numpy as np
 from memory_profiler import memory_usage
 
 @click.command()
@@ -65,7 +66,7 @@ def profile_repo(repo_path, input_path, n=5):
             print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
-        res[id]['Time'] = [None for i in range(n)]
+        res[id]['Time'] = np.empty(n)
         total_time = 0
         for i in range(n):
             cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
