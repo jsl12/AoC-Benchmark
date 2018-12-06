@@ -31,17 +31,12 @@ def readconfig(config_path=None):
     with open(config_path, 'r') as file:
         return yaml.load(file)
 
-@functools.lru_cache(maxsize=1)
 def working_dir(config_path):
-    cfg = readconfig(config_path)
-    return Path(cfg['working_dir'])
+    return Path(readconfig(config_path)['working_dir'])
 
-@functools.lru_cache(maxsize=1)
 def inputs_dir(config_path=None):
-    cfg = readconfig(config_path)
-    return working_dir(config_path) / cfg['input']['repo_local']
+    return working_dir(config_path) / readconfig(config_path)['input']['repo_local']
 
-@functools.lru_cache(maxsize=1)
 def inputs_repo(config_path=None):
     return readconfig(config_path)['input']['repo_url']
 
