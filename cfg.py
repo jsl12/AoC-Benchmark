@@ -43,21 +43,21 @@ def inputs_repo(config_path=None):
 def repo_url(username, config_path=None):
     return readconfig(config_path)['users'][username]['repo_url']
 
-def user_dir(username, name, suffix, config_path=None):
+def user_dir(username, name, suffix, config_path=None, create=False):
     dir = readconfig(config_path)['users'][username].get(name, None)
     if dir is None:
         dir = '{}_{}'.format(username, suffix)
     res = working_dir(config_path) / dir
-    if not res.exists():
+    if not res.exists() and create:
         res.mkdir()
     return res
 
 def repo(username, config_path=None):
-    return user_dir(username, 'repo_local', '_repo', config_path)
+    return user_dir(username, 'repo_local', 'repo', config_path)
 
 def venv(username, config_path=None):
-    return user_dir(username, 'venv_local', '_venv', config_path)
+    return user_dir(username, 'venv_local', 'venv', config_path, create=False)
 
 def results(username, config_path=None):
-    return user_dir(username, 'results', '_results', config_path) / readconfig(config_path)['res_filename']
+    return user_dir(username, 'results', 'res', config_path) / readconfig(config_path)['res_filename']
 
