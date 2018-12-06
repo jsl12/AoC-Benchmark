@@ -25,7 +25,7 @@ def run_profiler(venv_dir, user_src_dir, inputs_dir):
 
 @click.command()
 @click.option('--users', help='users.yaml file')
-def from_users_ini(users):
+def from_user_config(users):
     cfg = yaml.load(open(users, 'r'))
 
     logging.info('Fetching Inputs')
@@ -46,4 +46,4 @@ def from_users_ini(users):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    from_users_ini()
+    from_user_config()
