@@ -37,7 +37,7 @@ import cfg
     '-uc',
     '--users_config',
     type=Path,
-    default='users.yaml',
+    default=None,
     show_default=True,
     help='Path to user configuration file'
 )
@@ -103,7 +103,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
-    with open(cfg.results(users_config, username), 'wb') as file:
+    with open(cfg.results(username, users_config), 'wb') as file:
         pickle.dump(res, file)
 
     return res

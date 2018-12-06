@@ -7,8 +7,6 @@ import subprocess
 
 import cfg
 
-INPUTS_DIR = 'AoC-Inputs'
-
 def build_env(giturl, git_dir, venv_dir):
     logging.info('Syncing solution repo')
     gitsync.sync_repo(giturl, git_dir)
@@ -25,14 +23,14 @@ def build_env(giturl, git_dir, venv_dir):
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
-def run_profiler(config_path, username):
-    py_path = cfg.venv(config_path, username) / 'Scripts' / 'python.exe'
+def run_profiler(username):
+    py_path = cfg.venv(username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
-        ('rp', cfg.repo(config_path, username)),
-        ('ip', cfg.inputs_dir(config_path)),
+        ('rp', cfg.repo(username)),
+        ('ip', cfg.inputs_dir()),
         ('u', username),
-        ('to', cfg.readconfig(config_path)['timeout'])
+        ('to', cfg.readconfig()['timeout'])
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
@@ -41,21 +39,25 @@ def run_profiler(config_path, username):
 @click.command()
 @click.option('--config_path', help='users.yaml file')
 def from_user_config(config_path):
+    import cfg
+    logging.info('Configuring benchmark platform with {}'.format(config_path))
+    cfg.CONFIG_PATH = config_path
+    cfg_yaml = cfg.readconfig()
+
     logging.info('Fetching Inputs')
     gitsync.sync_repo(
-        repo_url=cfg.inputs_repo(config_path),
-        dest_dir=str(cfg.inputs_dir(config_path))
+        repo_url=cfg.inputs_repo(),
+        dest_dir=str(cfg.inputs_dir())
     )
 
-    cfg = cfg.readconfig(config_path)
-    for username in cfg['users']:
-        git_url = cfg.repo_url(config_path, username)
-        git_path = cfg.repo(config_path, username)
-        venv_path = cfg.venv(config_path, username)
+    for username in cfg_yaml['users']:
+        git_url = cfg.repo_url(username)
+        git_path = cfg.repo(username)
+        venv_path = cfg.venv(username)
         build_env(git_url, git_path, venv_path)
 
         logging.info('Running benchmarks for {}'.format(username))
-        run_profiler(config_path, username)
+        run_profiler(username)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
