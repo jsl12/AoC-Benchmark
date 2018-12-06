@@ -37,8 +37,7 @@ import cfg
     '-uc',
     '--users_config',
     type=Path,
-    default=None,
-    show_default=True,
+    required=True,
     help='Path to user configuration file'
 )
 @click.option(

@@ -43,7 +43,7 @@ def inputs_repo(config_path=None):
 def repo_url(username, config_path=None):
     return readconfig(config_path)['users'][username]['repo_url']
 
-def user_dir(username, name, suffix, config_path=None, create=False):
+def user_dir(username, name, suffix, config_path=None, create=True):
     dir = readconfig(config_path)['users'][username].get(name, None)
     if dir is None:
         dir = '{}_{}'.format(username, suffix)
