@@ -1,6 +1,7 @@
 __pycache__
 .idea
-scratch/
+venv
+scratch
 scratch*.py
 users.*
 cstats
