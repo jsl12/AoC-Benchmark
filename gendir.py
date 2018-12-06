@@ -40,7 +40,12 @@ def venv(config_path, username):
 
 def results(config_path, username):
     cfg = readconfig(config_path)
+
     result_dir = cfg['users'][username].get('results', None)
     if result_dir is None:
         result_dir = '{}_results'.format(username)
-    return Path(cfg['working_dir']) / result_dir
+    result_dir = Path(cfg['working_dir']) / result_dir
+
+    if not result_dir.exists():
+        result_dir.mkdir()
+    return result_dir / cfg['res_filename']

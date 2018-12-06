@@ -3,7 +3,6 @@ import cProfile
 import pstats
 import sys
 import pickle
-import yaml
 
 import click
 import pandas as pd
@@ -104,11 +103,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
-    cfg = gendir.readconfig(users_config)
-    res_dir = gendir.results(users_config, username)
-    if not res_dir.exists():
-        res_dir.mkdir()
-    with open(res_dir / cfg['res_filename'], 'wb') as file:
+    with open(gendir.results(users_config, username), 'wb') as file:
         pickle.dump(res, file)
 
     return res

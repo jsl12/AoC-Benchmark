@@ -1,7 +1,6 @@
 import gitsync
 import venvbuild
 import os
-from pathlib import Path
 import click
 import logging
 import subprocess
@@ -27,14 +26,13 @@ def build_env(giturl, git_dir, venv_dir):
 
 
 def run_profiler(config_path, username):
-    cfg = gendir.readconfig(config_path)
-    working_dir = Path(cfg['working_dir'])
     py_path = gendir.venv(config_path, username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
         ('rp', gendir.repo(config_path, username)),
-        ('ip', working_dir / INPUTS_DIR),
-        ('u', username)
+        ('ip', gendir.inputs_dir(config_path)),
+        ('u', username),
+        ('to', gendir.readconfig(config_path)['timeout'])
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
