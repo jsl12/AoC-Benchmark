@@ -42,7 +42,6 @@ def from_users_ini(users):
         build_env(user['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
-
         run_profiler(venv_path, git_path, inputs_dir)
 
 
