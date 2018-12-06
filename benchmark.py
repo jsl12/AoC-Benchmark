@@ -1,6 +1,7 @@
 import gitsync
 import venvbuild
 import os
+from pathlib import Path
 import yaml
 import click
 import logging
@@ -37,13 +38,22 @@ def from_user_config(users):
         username = list(u)[0]
         user = u[username]
         logging.info('Building environment for {}'.format(username))
-        git_path = os.path.join(working_dir, username + '_repo')
-        venv_path = os.path.join(working_dir, username + '_venv')
+        git_path = gen_repo_dir(username)
+        venv_path = gen_venv_dir(username)
         build_env(user['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
         run_profiler(venv_path, git_path, inputs_dir)
 
+def gen_repo_dir(working_dir, username):
+    if isinstance(working_dir, str):
+        working_dir = Path(working_dir)
+    return working_dir / '{}_repo'.format(username)
+
+def gen_venv_dir(working_dir, username):
+    if isinstance(working_dir, str):
+        working_dir = Path(working_dir)
+    return working_dir / '{}_venv'.format(username)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
