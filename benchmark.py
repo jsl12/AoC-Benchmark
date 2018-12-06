@@ -45,15 +45,19 @@ def from_user_config(users):
         logging.info('Computing benchmarks for {}'.format(username))
         run_profiler(venv_path, git_path, inputs_dir)
 
-def gen_repo_dir(working_dir, username):
+def gen_dir(working_dir, username, suffix):
     if isinstance(working_dir, str):
         working_dir = Path(working_dir)
-    return working_dir / '{}_repo'.format(username)
+    return working_dir / '{}{}'.format(username, suffix)
+
+def gen_repo_dir(working_dir, username):
+    gen_dir(working_dir, username, '_repo')
 
 def gen_venv_dir(working_dir, username):
-    if isinstance(working_dir, str):
-        working_dir = Path(working_dir)
-    return working_dir / '{}_venv'.format(username)
+    gen_dir(working_dir, username, '_venv')
+
+def gen_result_dir(working_dir, username):
+    gen_dir(working_dir, username, '_results')
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
