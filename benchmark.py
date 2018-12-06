@@ -38,8 +38,8 @@ def from_user_config(users):
         username = list(u)[0]
         user = u[username]
         logging.info('Building environment for {}'.format(username))
-        git_path = gen_repo_dir(username)
-        venv_path = gen_venv_dir(username)
+        git_path = str(gen_repo_dir(working_dir, username))
+        venv_path = str(gen_venv_dir(working_dir, username))
         build_env(user['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
@@ -51,13 +51,13 @@ def gen_dir(working_dir, username, suffix):
     return working_dir / '{}{}'.format(username, suffix)
 
 def gen_repo_dir(working_dir, username):
-    gen_dir(working_dir, username, '_repo')
+    return gen_dir(working_dir, username, '_repo')
 
 def gen_venv_dir(working_dir, username):
-    gen_dir(working_dir, username, '_venv')
+    return gen_dir(working_dir, username, '_venv')
 
 def gen_result_dir(working_dir, username):
-    gen_dir(working_dir, username, '_results')
+    return gen_dir(working_dir, username, '_results')
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
