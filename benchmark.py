@@ -22,9 +22,17 @@ def build_env(giturl, git_dir, venv_dir):
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
-def run_profiler(venv_dir, user_src_dir, inputs_dir):
-    py = venv_dir / 'Scripts' / 'python.exe'
-    cmd = [str(py), 'prof.py', '-rp', str(user_src_dir), '-ip', str(inputs_dir)]
+def run_profiler(username, cfg):
+    working_dir = Path(cfg['working_dir'])
+    py_path = gendir.venv(working_dir, username) / 'Scripts' / 'python.exe'
+    cmd = [str(py_path), 'prof.py']
+    cmds = [
+        ('rp', gendir.repo(working_dir, username)),
+        ('ip', working_dir / INPUTS_DIR),
+        ('u', username)
+    ]
+    for c in cmds:
+        cmd.extend(['-{}'.format(c[0]), str(c[1])])
     subprocess.run(cmd)
 
 @click.command()
@@ -46,7 +54,7 @@ def from_user_config(users):
         build_env(user['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
-        run_profiler(venv_path, git_path, inputs_dir)
+        run_profiler(username, cfg)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
