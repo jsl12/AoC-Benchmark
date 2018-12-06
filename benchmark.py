@@ -27,21 +27,22 @@ def run_profiler(venv_dir, user_src_dir, inputs_dir):
 @click.option('--users', help='users.yaml file')
 def from_user_config(users):
     cfg = yaml.load(open(users, 'r'))
+    working_dir = cfg['working_dir']
 
     logging.info('Fetching Inputs')
-    gitsync.sync_repo(cfg['input']['repo_url'], INPUTS_DIR)
+    inputs_dir = os.path.join(working_dir, INPUTS_DIR)
+    gitsync.sync_repo(cfg['input']['repo_url'], inputs_dir)
 
     for u in cfg['users']:
         username = list(u)[0]
         user = u[username]
         logging.info('Building environment for {}'.format(username))
-        git_path = username + '_repo'
-        venv_path = username + '_venv'
+        git_path = os.path.join(working_dir, username + '_repo')
+        venv_path = os.path.join(working_dir, username + '_venv')
         build_env(user['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
-
-        run_profiler(venv_path, git_path, INPUTS_DIR)
+        run_profiler(venv_path, git_path, inputs_dir)
 
 
 if __name__ == "__main__":
