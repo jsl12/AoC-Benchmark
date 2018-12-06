@@ -89,8 +89,6 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         n_timeout = int((timeout - t) / t)
         if n_timeout < n:
             n = n_timeout
-            if n == 0:
-                n = 1
             print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
@@ -102,8 +100,9 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
             t = extract_time(stats, DUT)
             total_time += t
             res[id]['Time'][i] = t
-        avg_time = total_time / n
-        print('{:.1f} ms average'.format(avg_time))
+        if n > 0:
+            avg_time = total_time / n
+            print('{:.1f} ms average'.format(avg_time))
 
     with open(cfg.result_dir(username, users_config), 'wb') as file:
         pickle.dump(res, file)
