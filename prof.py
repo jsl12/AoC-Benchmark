@@ -104,10 +104,8 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
-    with open(users_config, 'r') as file:
-        cfg = yaml.load(file)
-    cfg['working_dir']
-    res_dir = gendir.result(cfg['working_dir'], username)
+    cfg = gendir.readconfig(users_config)
+    res_dir = gendir.results(users_config, username)
     if not res_dir.exists():
         res_dir.mkdir()
     with open(res_dir / cfg['res_filename'], 'wb') as file:

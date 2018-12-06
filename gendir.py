@@ -7,11 +7,6 @@ def readconfig(config_path):
     with open(config_path, 'r') as file:
         return yaml.load(file)
 
-def gen_dir(working_dir, username, suffix):
-    if isinstance(working_dir, str):
-        working_dir = Path(working_dir)
-    return working_dir / '{}{}'.format(username, suffix)
-
 def repo(config_path, username):
     cfg = readconfig(config_path)
     repo_dir = cfg['users'][username].get('repo_local', None)
@@ -26,5 +21,9 @@ def venv(config_path, username):
         venv_dir = '{}_repo'.format(username)
     return Path(cfg['working_dir']) / venv_dir
 
-def result(working_dir, username):
-    return gen_dir(working_dir, username, '_results')
+def results(config_path, username):
+    cfg = readconfig(config_path)
+    result_dir = cfg['users'][username].get('results', None)
+    if result_dir is None:
+        result_dir = '{}_results'.format(username)
+    return Path(cfg['working_dir']) / result_dir
