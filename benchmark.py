@@ -22,11 +22,10 @@ def build_env(giturl, git_dir, venv_dir):
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
-def run_profiler(username, config_path):
-    with open(config_path, 'r') as file:
-        cfg = yaml.load(file)
+def run_profiler(config_path, username):
+    cfg = gendir.readconfig(config_path)
     working_dir = Path(cfg['working_dir'])
-    py_path = gendir.venv(working_dir, username) / 'Scripts' / 'python.exe'
+    py_path = gendir.venv(config_path, username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
         ('rp', gendir.repo(config_path, username)),
@@ -38,9 +37,9 @@ def run_profiler(username, config_path):
     subprocess.run(cmd)
 
 @click.command()
-@click.option('--users', help='users.yaml file')
-def from_user_config(users):
-    cfg = yaml.load(open(users, 'r'))
+@click.option('--config_path', help='users.yaml file')
+def from_user_config(config_path):
+    cfg = gendir.readconfig(config_path)
     working_dir = Path(cfg['working_dir'])
 
     logging.info('Fetching Inputs')
@@ -49,12 +48,12 @@ def from_user_config(users):
 
     for username in cfg['users']:
         logging.info('Building environment for {}'.format(username))
-        git_path = gendir.repo(users, username)
-        venv_path = gendir.venv(working_dir, username)
-        build_env(cfg[username]['repo_url'], git_path, venv_path)
+        git_path = gendir.repo(config_path, username)
+        venv_path = gendir.venv(config_path, username)
+        build_env(str(gendir.repo(config_path, username)), git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
-        run_profiler(username, users)
+        run_profiler(config_path, username)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
