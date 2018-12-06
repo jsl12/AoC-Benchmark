@@ -7,8 +7,11 @@ CONFIG_PATH = None
 
 @functools.lru_cache(maxsize=1)
 def readconfig(config_path=None):
+    global CONFIG_PATH
     if config_path is None and CONFIG_PATH is not None:
         config_path = CONFIG_PATH
+    elif config_path is not None:
+        CONFIG_PATH = config_path
     else:
         assert config_path is not None, 'cfg.CONFIG_PATH was not initialized'
 

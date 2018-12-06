@@ -39,10 +39,8 @@ def run_profiler(username):
 @click.command()
 @click.option('--config_path', help='users.yaml file')
 def from_user_config(config_path):
-    import cfg
     logging.info('Configuring benchmark platform with {}'.format(config_path))
-    cfg.CONFIG_PATH = config_path
-    cfg_yaml = cfg.readconfig()
+    cfg_yaml = cfg.readconfig(config_path)
 
     logging.info('Fetching Inputs')
     gitsync.sync_repo(
