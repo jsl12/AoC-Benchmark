@@ -24,10 +24,10 @@ def build_env(giturl, git_dir, venv_dir):
 
 
 def run_profiler(username):
-    py_path = cfg.venv(username) / 'Scripts' / 'python.exe'
+    py_path = cfg.venv_dir(username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
-        ('rp', cfg.repo(username)),
+        ('rp', cfg.repo_dir(username)),
         ('ip', cfg.inputs_dir()),
         ('u', username),
         ('to', cfg.readconfig()['timeout'])
@@ -50,8 +50,8 @@ def from_user_config(config_path):
 
     for username in cfg_yaml['users']:
         git_url = cfg.repo_url(username)
-        git_path = cfg.repo(username)
-        venv_path = cfg.venv(username)
+        git_path = cfg.repo_dir(username)
+        venv_path = cfg.venv_dir(username)
         build_env(git_url, git_path, venv_path)
 
         logging.info('Running benchmarks for {}'.format(username))

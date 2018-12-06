@@ -105,7 +105,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         avg_time = total_time / n
         print('{:.1f} ms average'.format(avg_time))
 
-    with open(cfg.results(username, users_config), 'wb') as file:
+    with open(cfg.result_dir(username, users_config), 'wb') as file:
         pickle.dump(res, file)
 
     return res

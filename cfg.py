@@ -52,12 +52,12 @@ def user_dir(username, name, suffix, config_path=None, create=False):
         res.mkdir()
     return res
 
-def repo(username, config_path=None):
+def repo_dir(username, config_path=None):
     return user_dir(username, 'repo_local', 'repo', config_path)
 
-def venv(username, config_path=None):
+def venv_dir(username, config_path=None):
     return user_dir(username, 'venv_local', 'venv', config_path, create=False)
 
-def results(username, config_path=None):
+def result_dir(username, config_path=None):
     return user_dir(username, 'results', 'res', config_path) / readconfig(config_path)['res_filename']
 
