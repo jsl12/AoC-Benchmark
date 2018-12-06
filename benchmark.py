@@ -22,12 +22,14 @@ def build_env(giturl, git_dir, venv_dir):
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
-def run_profiler(username, cfg):
+def run_profiler(username, config_path):
+    with open(config_path, 'r') as file:
+        cfg = yaml.load(file)
     working_dir = Path(cfg['working_dir'])
     py_path = gendir.venv(working_dir, username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
-        ('rp', gendir.repo(working_dir, username)),
+        ('rp', gendir.repo(config_path, username)),
         ('ip', working_dir / INPUTS_DIR),
         ('u', username)
     ]
@@ -45,16 +47,14 @@ def from_user_config(users):
     inputs_dir = working_dir / INPUTS_DIR
     gitsync.sync_repo(cfg['input']['repo_url'], str(inputs_dir))
 
-    for u in cfg['users']:
-        username = list(u)[0]
-        user = u[username]
+    for username in cfg['users']:
         logging.info('Building environment for {}'.format(username))
-        git_path = gendir.repo(working_dir, username)
+        git_path = gendir.repo(users, username)
         venv_path = gendir.venv(working_dir, username)
-        build_env(user['repo_url'], git_path, venv_path)
+        build_env(cfg[username]['repo_url'], git_path, venv_path)
 
         logging.info('Computing benchmarks for {}'.format(username))
-        run_profiler(username, cfg)
+        run_profiler(username, users)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
