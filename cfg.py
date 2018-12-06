@@ -44,26 +44,22 @@ def repo_url(username, config_path=None):
     return readconfig(config_path)['users'][username]['repo_url']
 
 def repo(username, config_path=None):
-    cfg = readconfig(config_path)
-    repo_dir = cfg['users'][username].get('repo_local', None)
+    repo_dir = readconfig(config_path)['users'][username].get('repo_local', None)
     if repo_dir is None:
         repo_dir = '{}_repo'.format(username)
-    return Path(cfg['working_dir']) / repo_dir
+    return working_dir(config_path) / repo_dir
 
 def venv(username, config_path=None):
-    cfg = readconfig(config_path)
-    venv_dir = cfg['users'][username].get('venv_local', None)
+    venv_dir = readconfig(config_path)['users'][username].get('venv_local', None)
     if venv_dir is None:
         venv_dir = '{}_venv'.format(username)
-    return Path(cfg['working_dir']) / venv_dir
+    return working_dir(config_path) / venv_dir
 
 def results(username, config_path=None):
-    cfg = readconfig(config_path)
-
-    result_dir = cfg['users'][username].get('results', None)
+    result_dir = readconfig(config_path)['users'][username].get('results', None)
     if result_dir is None:
         result_dir = '{}_results'.format(username)
-    result_dir = Path(cfg['working_dir']) / result_dir
+    result_dir = working_dir(config_path) / result_dir
 
     if not result_dir.exists():
         result_dir.mkdir()
