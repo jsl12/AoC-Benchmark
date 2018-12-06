@@ -89,6 +89,8 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         n_timeout = int((timeout - t) / t)
         if n_timeout < n:
             n = n_timeout
+            if n == 0:
+                n = 1
             print('Adjusting to {} runs'.format(n))
 
         print('Starting {} runs...'.format(n))
