@@ -64,7 +64,9 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     from register import REGISTRATION
     sys.path.pop(0)
 
-    cstats = str(cfg.working_dir(users_config)  / 'cstats.temp')
+    c = cfg.Config(users_config)
+
+    cstats = str(c.working_dir  / 'cstats.temp')
 
     res = []
     for id, DUT in REGISTRATION:
@@ -106,7 +108,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
 
         res.append((id, {'Memory': mem_use, 'Time': times}))
 
-    with open(cfg.result_dir(username, users_config), 'wb') as file:
+    with open(c.results(username) / c.res_filename, 'wb') as file:
         pickle.dump(res, file)
 
     return res
