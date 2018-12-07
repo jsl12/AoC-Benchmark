@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from memory_profiler import memory_usage
 
-import cfg
+import config
 
 @click.command()
 @click.option(
@@ -64,9 +64,9 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     from register import REGISTRATION
     sys.path.pop(0)
 
-    c = cfg.Config(users_config)
+    cfg = config.Config(users_config)
 
-    cstats = str(c.working_dir  / 'cstats.temp')
+    cstats = str(cfg.working_dir  / 'cstats.temp')
 
     res = []
     for id, DUT in REGISTRATION:
@@ -108,7 +108,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
 
         res.append((id, {'Memory': mem_use, 'Time': times}))
 
-    with open(c.results(username) / c.res_filename, 'wb') as file:
+    with open(cfg.results(username) / cfg.res_filename, 'wb') as file:
         pickle.dump(res, file)
 
     return res

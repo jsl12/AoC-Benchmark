@@ -5,7 +5,7 @@ import click
 import logging
 import subprocess
 
-import cfg
+import config
 
 def build_env(giturl, git_dir, venv_dir):
     logging.info('Syncing solution repo')
@@ -23,16 +23,15 @@ def build_env(giturl, git_dir, venv_dir):
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
 
 
-def run_profiler(username, config):
-    c = config
-    py_path = c.venv(username) / 'Scripts' / 'python.exe'
+def run_profiler(username, config_file):
+    py_path = config_file.venv(username) / 'Scripts' / 'python.exe'
     cmd = [str(py_path), 'prof.py']
     cmds = [
-        ('rp', c.repo(username)),
-        ('ip', c.inputs_dir),
+        ('rp', config_file.repo(username)),
+        ('ip', config_file.inputs_dir),
         ('u', username),
-        ('to', c.timeout),
-        ('uc', c.path)
+        ('to', config_file.timeout),
+        ('uc', config_file.path)
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
@@ -42,19 +41,19 @@ def run_profiler(username, config):
 @click.option('--config_path', help='users.yaml file')
 def from_user_config(config_path):
     logging.info('Configuring benchmark platform with {}'.format(config_path))
-    c = cfg.Config(config_path)
+    cfg = config.Config(config_path)
 
     logging.info('Fetching Inputs')
     gitsync.sync_repo(
-        repo_url=c.inputs_url,
-        dest_dir=str(c.inputs_dir)
+        repo_url=cfg.inputs_url,
+        dest_dir=str(cfg.inputs_dir)
     )
 
-    for username in c.users:
-        build_env(c.repo_url(username), c.repo(username), c.venv(username))
+    for username in cfg.users:
+        build_env(cfg.repo_url(username), cfg.repo(username), cfg.venv(username))
 
         logging.info('Running benchmarks for {}'.format(username))
-        run_profiler(username, c)
+        run_profiler(username, cfg)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
