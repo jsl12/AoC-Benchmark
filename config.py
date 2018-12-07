@@ -13,7 +13,7 @@ class Config:
         self.yaml = yaml.load(open(path, 'r'))
 
         self.res_filename = self.yaml.get('res_filename', 'res.pickle')
-        self.timeout = self.yaml.get('timeout', 1000)
+        self.timeout = self.yaml.get('timeout', -1)
         self.working_dir = self.yaml['working_dir']
         self.inputs_url = self.yaml['input']['repo_url']
         self.inputs_dir = self.working_dir / self.yaml['input']['repo_local']

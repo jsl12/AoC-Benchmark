@@ -29,7 +29,7 @@ import config
 @click.option(
     '-n',
     type=int,
-    default=100,
+    default=1000,
     show_default=True,
     help='Number of times to run cProfile'
 )
@@ -51,11 +51,12 @@ import config
     '-to',
     '--timeout',
     type=int,
-    default=10000,
+    default=-1,
     show_default=True,
     help='Timeout in ms. Profiler will try to only run each solution for this long'
 )
 def profile_repo(repo_path, input_path, n, users_config, username, timeout):
+    # TODO refactor to not use users_config at all
     # repo_path should be a Path object and needs to have register.py in the root directory
     # input path should be a Path object and should have files that match the glob day*{}*.txt
     # n is the number of times to run cProfile
@@ -86,10 +87,11 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         t = extract_time(stats, DUT)
         print('{:.1f} ms'.format(t))
 
-        n_timeout = int((timeout - t) / t)
-        if n_timeout < n:
-            n = n_timeout
-            print('Adjusting to {} runs'.format(n))
+        if timeout >= 0:
+            n_timeout = int((timeout - t) / t)
+            if n_timeout < n:
+                n = n_timeout
+                print('Adjusting to {} runs'.format(n))
 
         times = np.empty(n)
         if n > 0:
