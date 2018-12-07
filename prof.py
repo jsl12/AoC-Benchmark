@@ -2,6 +2,7 @@ from pathlib import Path
 import cProfile
 import pstats
 import sys
+import os
 import pickle
 
 import click
@@ -64,6 +65,8 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     from register import REGISTRATION
     sys.path.pop(0)
 
+    cstats = str(cfg.working_dir(users_config)  / 'cstats.temp')
+
     res = {}
     for id, DUT in REGISTRATION:
         # print('Starting profile of {}'.format(day))
@@ -80,8 +83,8 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         print('{:.2f} MB'.format(res[id]['Memory']))
 
         print('Initial solution run:')
-        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
-        stats = pstats.Stats('cstats')
+        cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename=cstats)
+        stats = pstats.Stats(cstats)
         t = extract_time(stats, DUT)
         print('{:.1f} ms'.format(t))
 
@@ -94,8 +97,8 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
         res[id]['Time'] = np.empty(n)
         total_time = 0
         for i in range(n):
-            cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename='cstats')
-            stats = pstats.Stats('cstats')
+            cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename=cstats)
+            stats = pstats.Stats(cstats)
             t = extract_time(stats, DUT)
             total_time += t
             res[id]['Time'][i] = t
