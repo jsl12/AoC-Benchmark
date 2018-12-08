@@ -1,6 +1,7 @@
 from pathlib import Path
 from config import Config
 import pickle
+import pandas as pd
 
 def load_results(config_file, username):
     assert isinstance(config_file, Path) or isinstance(config_file, str)
@@ -9,26 +10,21 @@ def load_results(config_file, username):
     if isinstance(username, list):
         res = {}
         for u in username:
-            res[u] = pickle.load(open(cfg.results(u), 'rb'))
+            res[u] = make_df(pickle.load(open(cfg.results(u), 'rb')))
         return res
     elif isinstance(username, str):
         if username in cfg.users:
-            return pickle.load(open(cfg.results(username), 'rb'))
+            return make_df(pickle.load(open(cfg.results(username), 'rb')))
         else:
             print('User {} not found in {}'.format(username, cfg.path.name))
 
 def get_solutions(results):
     return [sol[0] for sol in results]
 
-def find_common_solutions(results):
-    sols = [get_solutions(results[user]) for user in results]
-    cmd = ['set(sols[{}])'.format(i) for i, lis in enumerate(sols)]
-    cmd = 'res = list({})'.format(' & '.join(cmd))
-    exec(cmd)
-    if len(res) > 0:
-        return res
+def make_df(results):
+    return pd.DataFrame({res[0]: res[1]['Time'] for res in results})
 
 if __name__ == '__main__':
     res = load_results('users.yaml', ['John', 'Shahvir'])
-    find_common_solutions(res)
+    # res = load_results('users.yaml', 'John')
     print(res)
