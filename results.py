@@ -18,9 +18,6 @@ def load_results(config_file, username):
         else:
             print('User {} not found in {}'.format(username, cfg.path.name))
 
-def get_solutions(results):
-    return [sol[0] for sol in results]
-
 def make_df(results):
     return pd.DataFrame({res[0]: res[1]['Time'] for res in results})
 
