@@ -4,9 +4,14 @@ import pickle
 import pandas as pd
 
 def load_results(config_file, username):
-    assert isinstance(config_file, Path) or isinstance(config_file, str)
+    assert isinstance(config_file, Path) or isinstance(config_file, str) or isinstance(config_file, Config)
     assert isinstance(username, list) or isinstance(username, str)
-    cfg = Config(config_file)
+
+    if not isinstance(config_file, Config):
+        cfg = Config(config_file)
+    else:
+        cfg = config_file
+
     if isinstance(username, list):
         res = {}
         for u in username:
