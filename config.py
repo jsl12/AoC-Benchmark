@@ -22,14 +22,22 @@ class Config:
     def repo_url(self, username):
         return self.users[username]['repo_url']
 
+    def _abs(self, dir):
+        if isinstance(dir, str):
+            dir = Path(dir)
+        if not dir.is_absolute():
+            return self.working_dir / dir
+        else:
+            return dir
+
     def repo(self, username):
-        return self.working_dir / self.users[username].get('repo_local', self.working_dir / '{}_repo'.format(username))
+        return self._abs(self.users[username].get('repo_local', '{}_repo'.format(username)))
 
     def venv(self, username):
-        return self.working_dir / self.users[username].get('venv', self.working_dir / '{}_venv'.format(username))
+        return self._abs(self.users[username].get('venv', '{}_venv'.format(username)))
 
     def results(self, username):
-        dir = self.working_dir / self.users[username].get('results', self.working_dir / '{}_res'.format(username))
+        dir = self._abs(self.users[username].get('results', '{}_res'.format(username)))
         if not dir.exists():
             dir.mkdir()
         return dir / self.res_filename
