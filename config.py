@@ -23,14 +23,14 @@ class Config:
         return self.users[username]['repo_url']
 
     def repo(self, username):
-        return self.users[username].get('repo_local', self.working_dir / '{}_repo'.format(username))
+        return self.working_dir / self.users[username].get('repo_local', self.working_dir / '{}_repo'.format(username))
 
     def venv(self, username):
-        return self.users[username].get('venv', self.working_dir / '{}_venv'.format(username))
+        return self.working_dir / self.users[username].get('venv', self.working_dir / '{}_venv'.format(username))
 
     def results(self, username):
-        dir = self.users[username].get('results', self.working_dir / '{}_res'.format(username))
+        dir = self.working_dir / self.users[username].get('results', self.working_dir / '{}_res'.format(username))
         if not dir.exists():
             dir.mkdir()
-        return dir
+        return dir / self.res_filename
 
