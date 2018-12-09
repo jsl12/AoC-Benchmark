@@ -2,17 +2,15 @@ from config import Config
 import pickle
 import pandas as pd
 
-def load_results(config_file, username):
-    assert isinstance(username, list) or isinstance(username, str)
-
+def load_results(config_file, username=None):
     if not isinstance(config_file, Config):
         cfg = Config(config_file)
     else:
         cfg = config_file
 
-    if isinstance(username, list):
+    if username is None:
         res = {}
-        for u in username:
+        for u in cfg.users:
             res[u] = make_df(pickle.load(open(cfg.results(u), 'rb')))
         return res
     elif isinstance(username, str):
@@ -30,7 +28,7 @@ def find_common_solutions(results):
     return res
 
 if __name__ == '__main__':
-    res2 = load_results('users.yaml', ['John', 'Shahvir'])
+    res2 = load_results('users.yaml')
     common = find_common_solutions(res2)
     print(common)
     # res = load_results('users.yaml', 'John')
