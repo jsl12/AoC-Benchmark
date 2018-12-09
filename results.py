@@ -4,7 +4,6 @@ import pickle
 import pandas as pd
 
 def load_results(config_file, username):
-    assert isinstance(config_file, Path) or isinstance(config_file, str) or isinstance(config_file, Config)
     assert isinstance(username, list) or isinstance(username, str)
 
     if not isinstance(config_file, Config):
@@ -26,7 +25,22 @@ def load_results(config_file, username):
 def make_df(results):
     return pd.DataFrame({res[0]: res[1]['Time'] for res in results})
 
+def find_common_solutions(config):
+    if isinstance(config, Config):
+        cfg = config
+    elif isinstance(config, str):
+        cfg = Config(config)
+    else:
+        print('Not found')
+
+    results = load_results(config, [user for user in cfg.users])
+    cmd = 'global res; res = list({})'.format(' & '.join(['set(results[\'{}\'])'.format(user) for user in cfg.users]))
+    exec(cmd)
+    return res
+
 if __name__ == '__main__':
-    res = load_results('users.yaml', ['John', 'Shahvir'])
+    res2 = load_results('users.yaml', ['John', 'Shahvir'])
+    common = find_common_solutions('users.yaml')
+    print(common)
     # res = load_results('users.yaml', 'John')
-    print(res)
+    # print(res)
