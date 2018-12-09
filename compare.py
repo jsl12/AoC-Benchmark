@@ -25,8 +25,16 @@ def compare(ax, results, key):
 
 def compare_multiple(results, fig_path=None):
     common = rs.find_common_solutions(results)
-    fig, axes = plt.subplots(nrows=len(common), figsize=(19.2, 10.8 * len(common)))
+    fig, axes = plt.subplots(nrows=len(common), figsize=(19.2, 5 * len(common)))
+    plt.subplots_adjust(
+        top=.95,
+        bottom=.05,
+        right=.97,
+        left=.05
+    )
     for i, sol in enumerate(common):
         compare(axes[i], results, sol)
     if fig_path is not None:
         fig.savefig(fig_path)
+    else:
+        return fig
