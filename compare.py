@@ -38,4 +38,5 @@ def compare(ax, results, key):
     ax.legend(['{} ({:.1f} ms)'.format(user, results[user][key].mean()) for user in results])
     if df.max().max() > ax.get_ylim()[1]:
         statplot.auto_size_y(ax, df)
+    ax.set_ylim(0, ax.get_ylim()[1])
     ax.set_xlim(0, ax.get_xlim()[1])
