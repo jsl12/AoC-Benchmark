@@ -9,8 +9,6 @@ import pandas as pd
 import numpy as np
 from memory_profiler import memory_usage
 
-import config
-
 @click.command()
 @click.option(
     '-rp',
@@ -27,25 +25,18 @@ import config
     help='Path to folder containing input files. glob: \'day*{}*.txt\''
 )
 @click.option(
+    '-resp',
+    '--result_path',
+    required=True,
+    type=Path,
+    help='Path to result file'
+)
+@click.option(
     '-n',
     type=int,
     default=1000,
     show_default=True,
     help='Number of times to run cProfile'
-)
-@click.option(
-    '-uc',
-    '--users_config',
-    type=Path,
-    required=True,
-    help='Path to user configuration file'
-)
-@click.option(
-    '-u',
-    '--username',
-    type=str,
-    required=True,
-    help='Username to associate with results'
 )
 @click.option(
     '-to',
@@ -55,8 +46,7 @@ import config
     show_default=True,
     help='Timeout in ms. Profiler will try to only run each solution for this long'
 )
-def profile_repo(repo_path, input_path, n, users_config, username, timeout):
-    # TODO refactor to not use users_config at all
+def profile_repo(repo_path, input_path, result_path, n, timeout):
     # repo_path should be a Path object and needs to have register.py in the root directory
     # input path should be a Path object and should have files that match the glob day*{}*.txt
     # n is the number of times to run cProfile
@@ -65,9 +55,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
     from register import REGISTRATION
     sys.path.pop(0)
 
-    cfg = config.Config(users_config)
-
-    cstats = str(cfg.working_dir  / 'cstats.temp')
+    cstats = str(result_path.parents[0]  / 'cstats.temp')
 
     res = []
     for id, DUT in REGISTRATION:
@@ -110,7 +98,7 @@ def profile_repo(repo_path, input_path, n, users_config, username, timeout):
 
         res.append((id, {'Memory': mem_use, 'Time': times}))
 
-    with open(cfg.results(username) / cfg.res_filename, 'wb') as file:
+    with open(result_path, 'wb') as file:
         pickle.dump(res, file)
 
     return res

@@ -29,12 +29,12 @@ def run_profiler(username, config_file):
     cmds = [
         ('rp', config_file.repo(username)),
         ('ip', config_file.inputs_dir),
-        ('u', username),
-        ('to', config_file.timeout),
-        ('uc', config_file.path)
+        ('resp', config_file.results(username)),
+        ('to', config_file.timeout)
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
+    logging.debug(cmd)
     subprocess.run(cmd)
 
 @click.command()
