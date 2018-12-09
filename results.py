@@ -1,4 +1,3 @@
-from pathlib import Path
 from config import Config
 import pickle
 import pandas as pd
