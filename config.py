@@ -20,6 +20,7 @@ class Config:
         self.inputs_url = self.yaml['input']['repo_url']
         self.inputs_dir = self.working_dir / self.yaml['input']['repo_local']
         self.users = self.yaml['users']
+        self.n = self.yaml.get('n', 1000)
 
     def repo_url(self, username):
         return self.users[username]['repo_url']

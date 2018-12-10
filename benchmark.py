@@ -30,7 +30,8 @@ def run_profiler(username, config_file):
         ('rp', config_file.repo(username)),
         ('ip', config_file.inputs_dir),
         ('resp', config_file.results(username)),
-        ('to', config_file.timeout)
+        ('to', config_file.timeout),
+        ('n', config_file.n)
     ]
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])

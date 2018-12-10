@@ -34,7 +34,7 @@ from memory_profiler import memory_usage
 @click.option(
     '-n',
     type=int,
-    default=1000,
+    default=100,
     show_default=True,
     help='Number of times to run cProfile'
 )
