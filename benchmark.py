@@ -1,6 +1,7 @@
 import gitsync
 import venvbuild
 import os
+from pathlib import Path
 import click
 import logging
 import subprocess
@@ -24,8 +25,9 @@ def build_env(giturl, git_dir, venv_dir):
 
 
 def run_profiler(username, config_file):
+    original_cwd = Path.cwd()
     py_path = config_file.venv(username) / 'Scripts' / 'python.exe'
-    cmd = [str(py_path), 'prof.py']
+    cmd = [str(py_path), str(original_cwd / 'prof.py')]
     cmds = [
         ('rp', config_file.repo(username)),
         ('ip', config_file.inputs_dir),
@@ -36,7 +38,9 @@ def run_profiler(username, config_file):
     for c in cmds:
         cmd.extend(['-{}'.format(c[0]), str(c[1])])
     logging.debug(cmd)
+    os.chdir(config_file.repo(username))
     subprocess.run(cmd)
+    os.chdir(original_cwd)
 
 @click.command()
 @click.option('--config_path', help='users.yaml file')
