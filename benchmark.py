@@ -1,9 +1,10 @@
-import gitsync
-import venvbuild
-import os
 import click
+import compare
+import gitsync
 import logging
+import os
 import subprocess
+import venvbuild
 
 import config
 
@@ -55,6 +56,9 @@ def from_user_config(config_path):
 
         logging.info('Running benchmarks for {}'.format(username))
         run_profiler(username, cfg)
+
+    compare.plot_comparison(config_path, '2018 comparison.png')
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
