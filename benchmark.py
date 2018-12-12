@@ -57,7 +57,9 @@ def from_user_config(config_path):
         logging.info('Running benchmarks for {}'.format(username))
         run_profiler(username, cfg)
 
-    compare.plot_comparison(config_path, '2018 comparison.png')
+    OUTFILE = '2018 comparison.png' #TODO
+    plots = compare.plot_comparison(config_path, OUTFILE)
+    os.startfile(plots)
 
 
 if __name__ == "__main__":

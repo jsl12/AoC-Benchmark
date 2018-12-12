@@ -46,7 +46,9 @@ def compare(ax, results, key):
 def plot_comparison(config, filename):
     plt.rc('savefig', dpi=400)
     res = rs.load_results(config)
-    compare_multiple(res, rs.Config(config).working_dir / filename)
+    outpath = rs.Config(config).working_dir / filename
+    compare_multiple(res, outpath)
+    return outpath
 
 
 if __name__ == "__main__":
