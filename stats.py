@@ -66,5 +66,21 @@ def add_to_cache(df, function):
         df.index = pd.Index([i for i in range(df.count()[0])], name=df.index.name)
     df.to_csv(cache_path)
 
+def pstats_to_df(stats_obj):
+    df = pd.DataFrame({
+        'paths': [Path(func[0]) for func in stats_obj.stats],
+        'lines': [func[1] for func in stats_obj.stats],
+        'func names': [func[2] for func in stats_obj.stats],
+        # 'func names': [pstats.func_std_string(func) for func in stats_obj.stats],
+        'primitive calls': [stats_obj.stats[func][0] for func in stats_obj.stats],
+        'total calls': [stats_obj.stats[func][1] for func in stats_obj.stats],
+        'total time': [stats_obj.stats[func][2] * 1000 for func in stats_obj.stats],
+        'cumulative time': [stats_obj.stats[func][3] * 1000 for func in stats_obj.stats]
+    })
+
+    df['percall total'] = df['total time'] / df['total calls']
+    df['percall cumulative'] = df['cumulative time'] / df['primitive calls']
+    return df
+
 if __name__ == '__main__':
     click_collect_dataframe()
