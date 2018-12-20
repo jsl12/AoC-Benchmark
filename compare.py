@@ -45,7 +45,7 @@ def compare(ax, results, key):
 
 def plot_comparison(config, filename):
     plt.rc('savefig', dpi=400)
-    res = rs.load_results(config)
+    res = rs.load_times(config)
     outpath = rs.Config(config).working_dir / filename
     compare_multiple(res, outpath)
     return outpath
