@@ -85,25 +85,20 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
             n_timeout = int((timeout - t) / t)
             if n_timeout < n:
                 n = n_timeout
-                print('Adjusting to {} runs'.format(n))
-
-        times = np.empty(n)
-        if n > 0:
+                if n != 0:
+                    print('Adjusting to {} runs'.format(n))
+        if n == 0:
+            print('Not enough time for more runs')
+            res.append((id, {'Memory': mem_use, 'Time': np.array([t])}))
+        else:
             print('Starting {} runs...'.format(n))
-            total_time = 0
+            times = np.empty(n)
             for i in range(n):
                 cProfile.runctx('DUT(input)', globals=globals(), locals=locals(), filename=cstats)
                 stats = pstats.Stats(cstats)
-                t = extract_time(stats, DUT)
-                total_time += t
-                times[i] = t
-            avg_time = total_time / n
-            print('{:.1f} ms average'.format(avg_time))
-        else:
-            print('Not enough time for more runs')
-
-        res.append((id, {'Memory': mem_use, 'Time': times}))
-
+                times[i] = extract_time(stats, DUT)
+            print('{:.1f} ms average'.format(times.mean()))
+            res.append((id, {'Memory': mem_use, 'Time': times}))
         n = n_original
         dump_results(result_path, res)
 
@@ -127,7 +122,7 @@ def extract_time(pstats, func_handle):
 def dump_results(path, results):
     with fasteners.InterProcessLock(path.with_suffix('.lock')):
         with open(path, 'wb') as file:
-            print('Saving results for {} solutions'.format(len(results)))
+            print('Saving results for {} solutions to {}'.format(len(results), path.name))
             pickle.dump(results, file)
 
 if __name__ == '__main__':
