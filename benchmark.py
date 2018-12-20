@@ -8,11 +8,24 @@ import os
 import subprocess
 import venvbuild
 
-def build_env(giturl, git_dir, venv_dir):
-    logging.info('Syncing solution repo')
-    gitsync.sync_repo(giturl, git_dir)
+def setup_input_repo(config):
+    logging.info('Setting up input repo from {}'.format(config.inputs_url))
+    gitsync.sync_repo(
+        repo_url=config.inputs_url,
+        dest_dir=str(config.inputs_dir)
+    )
 
-    logging.info('Building user venv')
+def setup_solutions(config):
+    for username in config.users:
+        logging.info('Syncing solution repo for {}'.format(username))
+        gitsync.sync_repo(config.repo_url(username), config.repo(username))
+
+def setup_venvs(config):
+    for username in config.users:
+        logging.info('Building venv for {}'.format(username))
+        build_venv(config.repo(username), config.venv(username))
+
+def build_venv(git_dir, venv_dir):
     venvbuild.create_venv(venv_dir)
 
     logging.info('Installing solution requirements')
@@ -22,7 +35,6 @@ def build_env(giturl, git_dir, venv_dir):
     logging.info('Installing profiler requirements')
     profiler_reqs = 'profiler_requirements.txt'
     venvbuild.pip_install_requirements(venv_dir, profiler_reqs)
-
 
 def run_profiler(username, config_file):
     original_cwd = Path.cwd()
@@ -47,24 +59,18 @@ def run_profiler(username, config_file):
 def from_user_config(config_path):
     logging.info('Configuring benchmark platform with {}'.format(config_path))
     cfg = config.Config(config_path)
-
-    logging.info('Fetching Inputs')
-    gitsync.sync_repo(
-        repo_url=cfg.inputs_url,
-        dest_dir=str(cfg.inputs_dir)
-    )
+    setup_input_repo(cfg)
+    setup_solutions(cfg)
+    setup_venvs(cfg)
 
     for username in cfg.users:
-        build_env(cfg.repo_url(username), cfg.repo(username), cfg.venv(username))
-
-        logging.info('Running benchmarks for {}'.format(username))
+        logging.info('Profiling solutions for {}'.format(username))
         run_profiler(username, cfg)
 
     OUTFILE = '2018 comparison.png' #TODO
     plots = compare.plot_comparison(config_path, OUTFILE)
     os.startfile(plots)
 
-
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     from_user_config()
