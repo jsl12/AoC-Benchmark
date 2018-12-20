@@ -65,7 +65,12 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
         input = get_input(id, input_path)
 
         print('Assessing memory usage...')
-        mem_use = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
+        try:
+            mem_use = memory_usage((DUT, (), {'input': input}), max_usage=True)[0]
+        except Exception as e:
+            print(' {} '.format('SOLUTION FAILED').center(50, '*'))
+            print(e)
+            continue
         print('{:.2f} MB'.format(mem_use))
 
         print('Initial solution run:')
