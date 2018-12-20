@@ -2,6 +2,7 @@ from config import Config
 import pickle
 import pandas as pd
 import numpy as np
+import fasteners
 
 def load_results(config_file, username=None):
     if not isinstance(config_file, Config):
@@ -12,11 +13,13 @@ def load_results(config_file, username=None):
     if username is None:
         res = {}
         for u in cfg.users:
-            res[u] = make_df(pickle.load(open(cfg.results(u), 'rb')))
+            with fasteners.InterProcessLock(cfg.results(u).with_suffix('.lock')):
+                res[u] = make_df(pickle.load(open(cfg.results(u), 'rb')))
         return res
     elif isinstance(username, str):
         if username in cfg.users:
-            return make_df(pickle.load(open(cfg.results(username), 'rb')))
+            with fasteners.InterProcessLock(cfg.results(username).with_suffix('.lock')):
+                return make_df(pickle.load(open(cfg.results(username), 'rb')))
         else:
             print('User {} not found in {}'.format(username, cfg.path.name))
 
