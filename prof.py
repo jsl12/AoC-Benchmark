@@ -2,12 +2,11 @@ from pathlib import Path
 import cProfile
 import pstats
 import sys
-import pickle
-
 import click
-import fasteners
 import numpy as np
 from memory_profiler import memory_usage
+
+import results
 
 @click.command()
 @click.option(
@@ -100,7 +99,7 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
             print('{:.1f} ms average'.format(times.mean()))
             res.append((id, {'Memory': mem_use, 'Time': times}))
         n = n_original
-        dump_results(result_path, res)
+        results.dump_results(result_path, res)
 
     return res
 
@@ -118,12 +117,6 @@ def extract_time(pstats, func_handle):
     for func in pstats.stats:
         if func_handle.__name__ == func[2]:
             return pstats.stats[func][3] * 1000
-
-def dump_results(path, results):
-    with fasteners.InterProcessLock(path.with_suffix('.lock')):
-        with open(path, 'wb') as file:
-            print('Saving results for {} solutions to {}'.format(len(results), path.name))
-            pickle.dump(results, file)
 
 if __name__ == '__main__':
     profile_repo()

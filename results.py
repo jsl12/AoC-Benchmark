@@ -4,6 +4,12 @@ import pandas as pd
 import numpy as np
 import fasteners
 
+def dump_results(path, results):
+    with fasteners.InterProcessLock(path.with_suffix('.lock')):
+        with open(path, 'wb') as file:
+            print('Saving results for {} solutions to {}'.format(len(results), path.name))
+            pickle.dump(results, file)
+
 def load_results(config_file, username=None):
     if not isinstance(config_file, Config):
         cfg = Config(config_file)
