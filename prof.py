@@ -5,6 +5,7 @@ import sys
 import pickle
 
 import click
+import fasteners
 import numpy as np
 from memory_profiler import memory_usage
 
@@ -104,9 +105,7 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
         res.append((id, {'Memory': mem_use, 'Time': times}))
 
         n = n_original
-
-    with open(result_path, 'wb') as file:
-        pickle.dump(res, file)
+        dump_results(result_path, res)
 
     return res
 
@@ -124,6 +123,12 @@ def extract_time(pstats, func_handle):
     for func in pstats.stats:
         if func_handle.__name__ == func[2]:
             return pstats.stats[func][3] * 1000
+
+def dump_results(path, results):
+    with fasteners.InterProcessLock(path.with_suffix('.lock')):
+        with open(path, 'wb') as file:
+            print('Saving results for {} solutions'.format(len(results)))
+            pickle.dump(results, file)
 
 if __name__ == '__main__':
     profile_repo()
