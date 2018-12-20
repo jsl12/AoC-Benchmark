@@ -8,41 +8,46 @@ def sync_repo(repo_url, dest_dir, branch='master', remote='origin'):
     if not isinstance(dest_dir, Path):
         dest_dir = Path(dest_dir)
 
-    # check to see if directory already exists. If it doesn't, then we can clone into it no problem
-    if not dest_dir.exists():
-        logging.info('Directory not found: {}'.format(dest_dir))
-        logging.info('Cloning from {}'.format(repo_url))
-        repo = git.Repo.clone_from(repo_url, dest_dir, branch=branch)
-    else:
-        try:
-            logging.info('Attempting to create repo from {}'.format(dest_dir))
-            repo = git.Repo(dest_dir)
-        except git.InvalidGitRepositoryError as e:
-            logging.info('Could not make repo from {}'.format(dest_dir))
-            repo = git.Repo.init(dest_dir)
+    # Creates the instance of the Repo object
+    try:
+        logging.info('Attempting to create repo from {}'.format(dest_dir))
+        repo = git.Repo(dest_dir)
+    except (git.InvalidGitRepositoryError, git.NoSuchPathError) as e:
+        logging.info('Creating repository at {}'.format(dest_dir))
+        repo = git.Repo.init(dest_dir)
 
-        if remote not in repo.remotes:
-            repo.create_remote(remote, repo_url)
+    # Makes sure there's a remote with the right name and fetches the data
+    try:
+        origin = repo.remotes[remote]
+    except IndexError as e:
+        origin = repo.create_remote(remote, repo_url)
+    origin.fetch()
 
-    # Should have a repo setup by now, no matter what
-    info = repo.remotes[remote].pull()
+    # Makes sure the remote has a branch with the right name
+    try:
+        origin.refs[branch]
+    except IndexError as e:
+        print('Branch \'{}\' not found on remote \'{}\''.format(branch, remote))
+        raise
 
-    # try:
-    #
-    #     repo = git.Repo.clone_from(repo_url, dest_dir, branch='master')
-    # except git.exc.GitCommandError as e:
-    #     if e.status == 128:
-    #         logging.info('   Syncing {} to {}'.format(repo_url, dest_dir))
-    #         g = git.cmd.Git(dest_dir)
-    #         g.pull()
-    #         #TODO get this working
-    #         return None
+    # Makes sure there's a local branch with the right name
+    try:
+        head = repo.heads[branch]
+    except IndexError as e:
+        head = repo.create_head(branch, origin.refs[branch])
+
+    # Make sure it's tracking the correct remote branch
+    if head.tracking_branch() != origin.refs[branch]:
+        head.set_tracking_branch(origin.refs[branch])
+
+    head.checkout()
+    info = origin.pull()
+
     return repo.working_dir
-
 
 if __name__ == "__main__":
     import config
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     REPO_URL = 'https://github.com/jsl12/AoC-Solutions'
     PATH = config.Config(Path('users.yaml')).working_dir / 'test_sync'
     sync_repo(REPO_URL, PATH)
