@@ -104,7 +104,7 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
 
 def get_input(id, path):
     id = id.split('.')
-    glob = '{}/*day*{}*.txt'.format(id[0], id[1])
+    glob = '{}/*day{}*.txt'.format(id[0], id[1])
     if isinstance(path, str):
         path = Path(path)
     file = [f for f in path.glob(glob)][0]
