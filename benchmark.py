@@ -64,7 +64,7 @@ def from_user_config(config_path):
     setup_venvs(cfg)
 
     for username in cfg.users:
-        logging.info('Profiling solutions for {}'.format(username))
+        logging.info(' Profiling {} '.format(username).center(100, '='))
         run_profiler(username, cfg)
 
     OUTFILE = '2018 comparison.png' #TODO
