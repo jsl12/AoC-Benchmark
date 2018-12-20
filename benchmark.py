@@ -17,12 +17,12 @@ def setup_input_repo(config):
 
 def setup_solutions(config):
     for username in config.users:
-        logging.info('Syncing solution repo for {}'.format(username))
+        logging.info(' syncing {} solutions '.format(username).center(100, '-'))
         gitsync.sync_repo(config.repo_url(username), config.repo(username))
 
 def setup_venvs(config):
     for username in config.users:
-        logging.info('Building venv for {}'.format(username))
+        logging.info(' build venv for {} '.format(username).center(100, '-'))
         build_venv(config.repo(username), config.venv(username))
 
 def build_venv(git_dir, venv_dir):
@@ -67,9 +67,9 @@ def from_user_config(config_path):
         logging.info(' Profiling {} '.format(username).center(100, '='))
         run_profiler(username, cfg)
 
-    OUTFILE = '2018 comparison.png' #TODO
-    plots = compare.plot_comparison(config_path, OUTFILE)
-    os.startfile(plots)
+    # OUTFILE = '2018 comparison.png' #TODO
+    # plots = compare.plot_comparison(config_path, OUTFILE)
+    # os.startfile(plots)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
