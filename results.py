@@ -1,6 +1,7 @@
 from config import Config
 import pickle
 import pandas as pd
+import numpy as np
 
 def load_results(config_file, username=None):
     if not isinstance(config_file, Config):
@@ -20,7 +21,12 @@ def load_results(config_file, username=None):
             print('User {} not found in {}'.format(username, cfg.path.name))
 
 def make_df(results):
-    return pd.DataFrame({res[0]: res[1]['Time'] for res in results})
+    res = pd.DataFrame(index=pd.Index(np.arange(max(len(values['Time']) for id, values in results))))
+    for id, values in results:
+        vals = np.full(len(res.index), np.nan)
+        vals [:values['Time'].size] = values['Time'][:]
+        res[id] = vals
+    return res
 
 def find_common_solutions(results):
     cmd = 'global res; res = list({})'.format(' & '.join(['set(results[\'{}\'])'.format(user) for user in results]))
