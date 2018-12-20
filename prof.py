@@ -57,6 +57,7 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
     cstats = str(result_path.parents[0]  / 'cstats.temp')
 
     res = []
+    n_original = n
     for id, DUT in REGISTRATION:
         # print('Starting profile of {}'.format(day))
         print(' {} '.format(id).center(50, '='))
@@ -101,6 +102,8 @@ def profile_repo(repo_path, input_path, result_path, n, timeout):
             print('Not enough time for more runs')
 
         res.append((id, {'Memory': mem_use, 'Time': times}))
+
+        n = n_original
 
     with open(result_path, 'wb') as file:
         pickle.dump(res, file)
