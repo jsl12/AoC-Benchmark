@@ -1,10 +1,21 @@
-from config import Config
-import pickle
-import pandas as pd
-import numpy as np
 import fasteners
+import numpy as np
+import pandas as pd
+import pickle
+from pathlib import Path
+from typing import Dict
 
-def dump_results(path, results):
+from config import Config
+
+
+def dump_results(path: Path, results: Dict) -> None:
+    """
+    Dumps the results to a pickle file using pickle.dump(...)
+
+    :param path: Path object, location of pickle file
+    :param results: result Dict
+    :return:
+    """
     with fasteners.InterProcessLock(path.with_suffix('.lock')):
         with open(path, 'wb') as file:
             n = sum(i[1]['Time'].size for i in results)

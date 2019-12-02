@@ -1,12 +1,14 @@
-from pathlib import Path
 import cProfile
 import pstats
 import sys
+from pathlib import Path
+
 import click
 import numpy as np
 from memory_profiler import memory_usage
 
 import results
+
 
 @click.command()
 @click.option(
@@ -46,6 +48,15 @@ import results
     help='Timeout in ms. Profiler will try to only run each solution for this long'
 )
 def profile_repo(repo_path, input_path, result_path, n, timeout):
+    """
+
+    :param repo_path: Path object, needs to have register.py in the root directory
+    :param input_path: Path object, files should match the glob day*{}*.txt
+    :param result_path: Path object,
+    :param n: int, number of times to run cProfile
+    :param timeout: int, timeout in ms
+    :return:
+    """
     # repo_path should be a Path object and needs to have register.py in the root directory
     # input path should be a Path object and should have files that match the glob day*{}*.txt
     # n is the number of times to run cProfile
