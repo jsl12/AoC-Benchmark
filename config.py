@@ -10,7 +10,7 @@ class Config:
             yaml_path = Path(yaml_path)
         assert isinstance(yaml_path, Path), 'path must be able to be turned into a Path object'
         self.path = yaml_path.resolve()
-        self.yaml = yaml.load(open(yaml_path, 'r'))
+        self.yaml = yaml.load(open(yaml_path, 'r'), Loader=yaml.SafeLoader)
 
         self.working_dir = Path(self.yaml['working_dir'])
         if not self.working_dir.is_absolute():
